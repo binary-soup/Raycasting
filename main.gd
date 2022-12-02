@@ -56,7 +56,7 @@ func _render_column(x : float, angle : float):
 	while true:
 		pos = _calc_intersection_point(pos, dir) + dir
 		
-		var dist := pos.distance_to(start_pos)
+		var dist := pos.distance_to(start_pos) * cos(angle) # fish eye fix
 		if dist > 1000:
 			break
 		
