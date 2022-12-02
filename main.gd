@@ -6,8 +6,11 @@ extends Node2D
 @onready var player := $Player
 @onready var camera := $Player/Camera2D
 
-const fov := PI/6
+const fov := PI/4
 const cell_size := 16
+
+const floor_colour := Color.BURLYWOOD
+const ceiling_colour := Color.CADET_BLUE
 
 const colours := {
 	Vector2i(0, 0): Color.RED,
@@ -47,6 +50,9 @@ func _render_column(x : float, angle : float):
 	var start_pos : Vector2 = player.position
 	var pos := start_pos
 	
+	var mid_point = viewport_size.y / 2
+	var wall_height := 0.0
+	
 	while true:
 		pos = _calc_intersection_point(pos, dir) + dir
 		
@@ -58,11 +64,13 @@ func _render_column(x : float, angle : float):
 		if coords == Vector2i(-1, -1):
 			continue
 			
-		var height : float = lerp(float(viewport_size.y)*0.8, 0.0, dist/1000)
-		var mid_point = viewport_size.y / 2
-			
-		draw_line(Vector2(x, mid_point - height / 2), Vector2(x, mid_point + height / 2), colours[coords])
+		wall_height = (viewport_size.y / 2) / dist * cell_size		
+		draw_line(Vector2(x, mid_point - wall_height), Vector2(x, mid_point + wall_height), colours[coords])
 		break
+	
+	draw_line(Vector2(x, 0), Vector2(x, mid_point - wall_height), ceiling_colour)
+	draw_line(Vector2(x, mid_point + wall_height), Vector2(x, viewport_size.y), floor_colour)
+	
 
 
 func _calc_intersection_point(pos : Vector2, dir : Vector2) -> Vector2:
