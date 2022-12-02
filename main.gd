@@ -1,9 +1,12 @@
 extends Node2D
 
+@export var raycast_mode := true
+
 @onready var tile_map := $TileMap
 @onready var player := $Player
+@onready var camera := $Player/Camera2D
 
-const fov := PI/3
+const fov := PI/6
 const cell_size := 16
 
 const colours := {
@@ -17,10 +20,22 @@ var viewport_size : Vector2i
 
 
 func _ready():
-	tile_map.visible = false
+	if raycast_mode:
+		tile_map.visible = false
+		player.visible = false
+	else:
+		camera.current = true
+
+
+func _process(delta):
+	if raycast_mode:
+		queue_redraw()
 
 
 func _draw():
+	if not raycast_mode:
+		return
+	
 	viewport_size = get_viewport_rect().size
 	for x in viewport_size.x:
 		_render_column(x, lerp_angle(-fov, fov, float(x) / viewport_size.x))
