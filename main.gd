@@ -8,8 +8,6 @@ extends Node2D
 @onready var player := $Player
 @onready var camera := $Player/Camera2D
 
-const cell_size := 16
-
 const colours := {
 	Vector2i(0, 0): Color.RED,
 	Vector2i(1, 0): Color.YELLOW,
@@ -45,34 +43,34 @@ func _draw():
 func _render_column(x : float, angle : float):
 	var dir := Vector2.UP.rotated(angle + player.rotation)
 	
-	var start_pos : Vector2 = player.position
+	var start_pos : Vector2 = player.position / 16
 	var pos := start_pos
 	
 	var mid_point = viewport_size.y / 2
 	var wall_height := 0.0
 	
 	while true:
-		pos = _calc_intersection_point(pos, dir) + dir
+		pos = _calc_intersection_point(pos, dir)
 		
-		var dist := pos.distance_to(start_pos) * cos(angle) # fish eye fix
+		var dist := pos.distance_to(start_pos) * cos(angle)
 		if dist > player.far_plane:
 			break
 		
-		var coords : Vector2i = tile_map.get_cell_atlas_coords(0, tile_map.local_to_map(pos))
+		var coords : Vector2i = tile_map.get_cell_atlas_coords(0, pos.floor())
 		if coords == Vector2i(-1, -1):
 			continue
 			
-		wall_height = (viewport_size.y / 2) / dist * cell_size		
+		wall_height = viewport_size.y / dist
 		draw_line(Vector2(x, mid_point - wall_height), Vector2(x, mid_point + wall_height), colours[coords])
 		break
 	
 	draw_line(Vector2(x, 0), Vector2(x, mid_point - wall_height), ceiling_colour)
 	draw_line(Vector2(x, mid_point + wall_height), Vector2(x, viewport_size.y), floor_colour)
-	
 
 
 func _calc_intersection_point(pos : Vector2, dir : Vector2) -> Vector2:
-	var cell := Rect2i(tile_map.local_to_map(pos) * cell_size, Vector2i(cell_size, cell_size))
+	var offset := Vector2(0.001, 0.001)
+	var cell := Rect2(pos.floor() - offset, Vector2(1, 1) + offset)
 	
 	if dir == Vector2.UP:
 		return Vector2(pos.x, cell.position.y)

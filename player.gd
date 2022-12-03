@@ -2,8 +2,8 @@ extends CharacterBody2D
 class_name Player
 
 @export var move_speed := 50
-@export var rotate_speed := 2*PI/3
-@export var fov := PI/4
+@export var rotate_speed := PI/3
+@export var fov := PI/6
 @export var far_plane := 300.0
 
 
