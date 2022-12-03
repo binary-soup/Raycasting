@@ -1,16 +1,14 @@
 extends Node2D
 
 @export var raycast_mode := true
+@export var floor_colour := Color.BURLYWOOD
+@export var ceiling_colour := Color.CADET_BLUE
 
 @onready var tile_map := $TileMap
 @onready var player := $Player
 @onready var camera := $Player/Camera2D
 
-const fov := PI/4
 const cell_size := 16
-
-const floor_colour := Color.BURLYWOOD
-const ceiling_colour := Color.CADET_BLUE
 
 const colours := {
 	Vector2i(0, 0): Color.RED,
@@ -41,7 +39,7 @@ func _draw():
 	
 	viewport_size = get_viewport_rect().size
 	for x in viewport_size.x:
-		_render_column(x, lerp_angle(-fov, fov, float(x) / viewport_size.x))
+		_render_column(x, lerp_angle(-player.fov, player.fov, float(x) / viewport_size.x))
 
 
 func _render_column(x : float, angle : float):
@@ -57,7 +55,7 @@ func _render_column(x : float, angle : float):
 		pos = _calc_intersection_point(pos, dir) + dir
 		
 		var dist := pos.distance_to(start_pos) * cos(angle) # fish eye fix
-		if dist > 1000:
+		if dist > player.far_plane:
 			break
 		
 		var coords : Vector2i = tile_map.get_cell_atlas_coords(0, tile_map.local_to_map(pos))
