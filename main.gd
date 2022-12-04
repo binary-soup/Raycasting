@@ -7,6 +7,7 @@ extends Node2D
 @onready var tile_map := $TileMap
 @onready var player := $Player
 @onready var camera := $Player/Camera2D
+@onready var fps_label := $Label
 
 const colours := {
 	Vector2i(0, 0): Color.RED,
@@ -16,6 +17,7 @@ const colours := {
 }
 
 var viewport_size : Vector2i
+var last_time := 0
 
 
 func _ready():
@@ -24,11 +26,15 @@ func _ready():
 		player.visible = false
 	else:
 		camera.current = true
+		fps_label.visible = false
 
 
 func _process(delta):
-	if raycast_mode:
-		queue_redraw()
+	if not raycast_mode:
+		return
+	
+	queue_redraw()	
+	fps_label.text = "Delta: %f ms, FPS: %f" % [delta * 1000, 1 / delta]
 
 
 func _draw():
