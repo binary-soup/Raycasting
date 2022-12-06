@@ -9,12 +9,36 @@
 config_version=5
 
 _global_script_classes=[{
+"base": "TextureRect",
+"class": &"Canvas",
+"language": &"GDScript",
+"path": "res://canvas.gd"
+}, {
+"base": "Label",
+"class": &"FPSLabel",
+"language": &"GDScript",
+"path": "res://FPSLabel.gd"
+}, {
+"base": "Control",
+"class": &"Main",
+"language": &"GDScript",
+"path": "res://main.gd"
+}, {
+"base": "TileMap",
+"class": &"Maze",
+"language": &"GDScript",
+"path": "res://maze.gd"
+}, {
 "base": "CharacterBody2D",
 "class": &"Player",
 "language": &"GDScript",
 "path": "res://player.gd"
 }]
 _global_script_class_icons={
+"Canvas": "",
+"FPSLabel": "",
+"Main": "",
+"Maze": "",
 "Player": ""
 }
 

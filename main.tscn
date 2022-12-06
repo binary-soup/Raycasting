@@ -1,48 +1,55 @@
-[gd_scene load_steps=7 format=3 uid="uid://djqq5frsaq0yf"]
+[gd_scene load_steps=6 format=3 uid="uid://dx5hiwbogp1s8"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_7qaav"]
+[ext_resource type="PackedScene" uid="uid://5005s1jul1gw" path="res://canvas.tscn" id="2_koy5b"]
 [ext_resource type="PackedScene" uid="uid://cvq8bpxksvjic" path="res://player.tscn" id="2_sdc5p"]
-[ext_resource type="Texture2D" uid="uid://b1fmx6nrf031c" path="res://assets/tilemap.png" id="3_0x1rf"]
-[ext_resource type="PackedScene" uid="uid://4ntowut6oijq" path="res://tile_map.tscn" id="3_ginx7"]
+[ext_resource type="PackedScene" uid="uid://4ntowut6oijq" path="res://maze.tscn" id="4_bd2vm"]
+[ext_resource type="Script" path="res://FPSLabel.gd" id="7_erhbp"]
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_4vp2e"]
-texture = ExtResource("3_0x1rf")
-0:0/0 = 0
-0:0/0/physics_layer_0/linear_velocity = Vector2(0, 0)
-0:0/0/physics_layer_0/angular_velocity = 0.0
-0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
-1:0/0 = 0
-1:0/0/physics_layer_0/linear_velocity = Vector2(0, 0)
-1:0/0/physics_layer_0/angular_velocity = 0.0
-1:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
-0:1/0 = 0
-0:1/0/physics_layer_0/linear_velocity = Vector2(0, 0)
-0:1/0/physics_layer_0/angular_velocity = 0.0
-0:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
-1:1/0 = 0
-1:1/0/physics_layer_0/linear_velocity = Vector2(0, 0)
-1:1/0/physics_layer_0/angular_velocity = 0.0
-1:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
-
-[sub_resource type="TileSet" id="TileSet_1agek"]
-physics_layer_0/collision_layer = 1
-sources/2 = SubResource("TileSetAtlasSource_4vp2e")
-
-[node name="Main" type="Node2D"]
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_7qaav")
 
-[node name="TileMap" parent="." instance=ExtResource("3_ginx7")]
-position = Vector2(-1, 0)
-tile_set = SubResource("TileSet_1agek")
-layer_0/tile_data = PackedInt32Array(-327686, 2, 0, -327685, 2, 0, -327684, 2, 0, -327683, 2, 0, -327682, 2, 0, -327681, 2, 0, -393216, 2, 0, -393215, 2, 0, -393214, 2, 0, -393213, 2, 0, -393212, 2, 0, -393211, 2, 0, -393210, 2, 0, -393209, 2, 0, -393208, 2, 0, -393207, 2, 0, -393206, 2, 0, -393205, 2, 0, -393204, 2, 0, -393203, 2, 0, -327667, 2, 0, -262131, 2, 0, -196595, 2, 0, -131059, 2, 0, -65523, 2, 0, 13, 2, 0, 65549, 2, 0, 131085, 2, 0, 196621, 2, 0, 262157, 2, 0, 327693, 2, 0, 393229, 2, 0, 458744, 2, 0, 393208, 2, 0, 327672, 2, 0, 262136, 2, 0, 196600, 2, 0, 131064, 2, 0, 65528, 2, 0, -8, 2, 0, -65544, 2, 0, -131080, 2, 0, -196616, 2, 0, -262152, 2, 0, -327688, 2, 0, -327687, 2, 0, -262148, 65538, 0, -196612, 65538, 0, -131076, 65538, 0, -65540, 65538, 0, -262147, 65538, 0, -196611, 65538, 0, -131075, 65538, 0, -65539, 65538, 0, 458745, 2, 0, 458746, 2, 0, 458747, 2, 0, 458748, 2, 0, 458749, 2, 0, 458750, 2, 0, 458751, 2, 0, 393216, 2, 0, 393217, 2, 0, 393218, 2, 0, 393219, 2, 0, 393220, 2, 0, 393221, 2, 0, 393222, 2, 0, 393223, 2, 0, 393224, 2, 0, 393225, 2, 0, 393226, 2, 0, 393227, 2, 0, 393228, 2, 0, 393210, 65538, 0, 327674, 65538, 0, 262138, 65538, 0, 196602, 65538, 0, 131066, 65538, 0, 131068, 65538, 0, 196604, 65538, 0, 262140, 65538, 0, 327676, 65538, 0, 327677, 65538, 0, 327678, 65538, 0, 327679, 65538, 0, 262143, 65538, 0, 196607, 65538, 0, 131071, 65538, 0, 65537, 65538, 0, 131073, 65538, 0, 196609, 65538, 0, 262145, 65538, 0, 327681, 65538, 0, -262151, 65538, 0, -196615, 65538, 0, -196614, 65538, 0, -262150, 65538, 0, 196612, 65538, 1, 196613, 2, 1, -65530, 2, 1, 196614, 2, 1, -196601, 2, 1, 196615, 2, 1, -196600, 2, 1, 65544, 2, 1, -196599, 2, 1, -196598, 2, 1, -196604, 65538, 1, -131068, 65538, 1, -65532, 65538, 1, 4, 65538, 1, 65540, 65538, 1, 131076, 65538, 1, 6, 2, 1, 65542, 2, 1, -65529, 2, 1, 196616, 2, 1, -65527, 2, 1, 9, 2, 1, 65545, 2, 1, -196597, 65538, 1, -131061, 65538, 1, -65525, 65538, 1, 11, 65538, 1, 65547, 65538, 1, 131083, 65538, 1, 196619, 65538, 1)
+[node name="Canvas" parent="." instance=ExtResource("2_koy5b")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 0.0
+offset_bottom = 0.0
+grow_horizontal = 2
+grow_vertical = 2
+ignore_texture_size = true
+player_path = NodePath("../SubViewportContainer/MiniMap/Player")
+maze_path = NodePath("../SubViewportContainer/MiniMap/Maze")
 
-[node name="Player" parent="." instance=ExtResource("2_sdc5p")]
-position = Vector2(8, 8)
+[node name="SubViewportContainer" type="SubViewportContainer" parent="."]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -210.0
+offset_right = 323.0
+grow_vertical = 0
+stretch = true
 
-[node name="Camera2D" type="Camera2D" parent="Player"]
-zoom = Vector2(5, 5)
+[node name="MiniMap" type="SubViewport" parent="SubViewportContainer"]
+handle_input_locally = false
+size = Vector2i(323, 210)
+render_target_update_mode = 4
 
-[node name="Label" type="Label" parent="."]
-offset_right = 40.0
-offset_bottom = 23.0
+[node name="Maze" parent="SubViewportContainer/MiniMap" instance=ExtResource("4_bd2vm")]
+
+[node name="Player" parent="SubViewportContainer/MiniMap" instance=ExtResource("2_sdc5p")]
+
+[node name="Camera" type="Camera2D" parent="SubViewportContainer/MiniMap/Player"]
+current = true
+
+[node name="FPSLabel" type="Label" parent="."]
+offset_right = 43.0
+offset_bottom = 26.0
 text = "FPS: ?"
+script = ExtResource("7_erhbp")
