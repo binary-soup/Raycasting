@@ -147,11 +147,13 @@ RayHit raycast(float angle) {
     ray.pos = camera_data.origin;
     ray.dir = rotation(angle - camera_data.rotation) * UP;
 
-    RayHit hit;
+    vec2 origin = ray.pos;
+
     while (true) {
+        RayHit hit;
         hit.point = calc_intersection_point(ray);
 
-        hit.dist += length(hit.point - ray.pos) * cos(angle);
+        hit.dist = length(hit.point - origin) * cos(angle);
         if (hit.dist > camera_data.far_plane) {
             return hit;
         }
@@ -163,8 +165,6 @@ RayHit raycast(float angle) {
 
         ray.pos = hit.point;
     }
-
-    return hit;
 }
 
 vec4 get_atlas_colour(int coords) {

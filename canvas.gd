@@ -160,6 +160,5 @@ func _render_frame():
 
 
 func _on_resized():
-	# TODO: resolve bottle neck for large images
-	#_recreate_texture()
+	# _recreate_texture() # TODO: resolve bottle neck for large images
 	pass
