@@ -1,10 +1,12 @@
-[gd_scene load_steps=2 format=3 uid="uid://5005s1jul1gw"]
+[gd_scene load_steps=3 format=3 uid="uid://5005s1jul1gw"]
 
 [ext_resource type="Script" path="res://canvas.gd" id="1_6suj1"]
+[ext_resource type="Texture2D" uid="uid://uma54tgpjm26" path="res://assets/uv_grid.png" id="2_bk080"]
 
 [node name="Canvas" type="TextureRect"]
 offset_right = 40.0
 offset_bottom = 40.0
 script = ExtResource("1_6suj1")
+tilemap_atlas = ExtResource("2_bk080")
 
 [connection signal="resized" from="." to="." method="_on_resized"]

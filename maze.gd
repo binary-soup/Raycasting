@@ -4,14 +4,14 @@ class_name Maze
 @export var ceiling_colour := Color.CADET_BLUE
 @export var floor_colour := Color.BURLYWOOD
 
-const num_atlas_cols := 2
+const atlas_dim := Vector2i(2, 2)
 const cell_size := 16
 
 class Tile extends Resource:
-	var atlas_coords : int
+	var atlas_coords : Vector2i
 	
 	func _init(coords : Vector2i):
-		atlas_coords = coords.y * num_atlas_cols + coords.x
+		atlas_coords = coords
 
 
 func _draw():

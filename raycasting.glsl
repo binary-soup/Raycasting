@@ -14,7 +14,7 @@ layout(set = 0, binding = 1, std430) restrict buffer CameraData {
 camera_data;
 
 struct Tile {
-    int atlas_coords;
+    ivec2 atlas_coords;
 };
 
 struct Rect2i {
@@ -25,12 +25,18 @@ struct Rect2i {
 layout(set = 0, binding = 2, std430) restrict buffer Tilemap {
     vec4 ceil_colour;
     vec4 floor_colour;
+
     Rect2i dim;
-    int num_atlas_cols;
+    ivec2 atlas_dim;
+
     int cell_size;
+    int pad;
+
     Tile[] tiles;
 }
 tilemap;
+
+layout(set = 0, binding = 3) uniform sampler2D tilemap_atlas;
 
 struct Ray {
     vec2 pos;
@@ -40,7 +46,7 @@ struct Ray {
 struct RayHit {
     vec2 point;
     float dist;
-    int atlas_coords;
+    ivec2 atlas_coords;
 };
 
 struct Rect2 {
@@ -67,6 +73,10 @@ mat2 rotation(float a) {
 
 float lerp(float from, float to, float weight) {
     return from + (to - from) * weight;
+}
+
+vec2 lerp_vec2(vec2 from, vec2 to, vec2 weight) {
+    return vec2(lerp(from.x, to.x, weight.x), lerp(from.y, to.y, weight.y));
 }
 
 vec2 floor_vec(vec2 v) {
@@ -159,27 +169,12 @@ RayHit raycast(float angle) {
         }
 
         hit.atlas_coords = get_tile(hit.point).atlas_coords;
-        if (hit.atlas_coords >= 0) {
+        if (hit.atlas_coords.x >= 0 && hit.atlas_coords.y >= 0) {
             return hit;
         }
 
         ray.pos = hit.point;
     }
-}
-
-vec4 get_atlas_colour(int coords) {
-    switch (coords) {
-        case 0:
-            return vec4(1.0, 0.0, 0.0, 1.0);
-        case 1:
-            return vec4(1.0, 1.0, 0.0, 1.0);
-        case 2:
-            return vec4(0.0, 1.0, 0.0, 1.0);
-        case 3:
-            return vec4(0.117647, 0.564706, 1.0, 1.0);
-    }
-
-    return vec4(1.0);
 }
 
 void draw_coloured_line(int start, int end, vec4 colour) {
@@ -188,12 +183,23 @@ void draw_coloured_line(int start, int end, vec4 colour) {
     }
 }
 
+void draw_textured_line(int start, int end, float u, ivec2 atlas_coords) {
+    vec2 offset = 1.0 / tilemap.atlas_dim;
+
+    for (int y = start; y < end; y++) {
+        float v = lerp(0.0, 1.0, float(y - start) / (end - start));
+
+        vec2 uv = lerp_vec2(offset * atlas_coords, offset * (atlas_coords + ivec2(1)), vec2(u, v));
+        imageStore(canvas, ivec2(gl_GlobalInvocationID.x, y), texture(tilemap_atlas, uv));
+    }
+}
+
 void draw_wall(RayHit ray) {
     int mid_point = canvas_size.y / 2;
     int height = int(floor(max_wall_height / ray.dist));
 
     draw_coloured_line(0, mid_point - height, tilemap.ceil_colour);
-    draw_coloured_line(mid_point - height, mid_point + height, get_atlas_colour(ray.atlas_coords));
+    draw_textured_line(mid_point - height, mid_point + height, 0.0, ray.atlas_coords); // TODO: read u from ray
     draw_coloured_line(mid_point + height, canvas_size.y, tilemap.floor_colour);
 }
 

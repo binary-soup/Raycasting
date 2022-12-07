@@ -7,6 +7,8 @@ class_name Canvas
 @export_node_path(Maze) var maze_path
 @onready var maze : Maze = get_node(maze_path)
 
+@export var tilemap_atlas : Texture2D
+
 var rd : RenderingDevice
 var shader : RID
 var pipeline : RID
@@ -40,7 +42,7 @@ func _process(_delta : float):
 
 func _init_compute():
 	rd = RenderingServer.create_local_rendering_device()
-	uniforms = [null, null, null]
+	uniforms = [null, null, null, null]
 	
 	# init shader and pipeline
 	var spirv := preload("res://raycasting.glsl").get_spirv()
@@ -49,6 +51,7 @@ func _init_compute():
 	
 	# create data uniforms that don't change
 	_build_tilemap_uniform()
+	_build_tilemap_atlas_uniform()
 
 
 func _build_canvas_texture_uniform(image : Image):
@@ -86,12 +89,40 @@ func _build_tilemap_uniform():
 	data.append_array(_colour_to_byte_array(maze.floor_colour))
 	
 	data.append_array(_rect2i_to_byte_array(maze.get_used_rect()))
-	data.append_array(PackedInt32Array([maze.num_atlas_cols, maze.cell_size,]).to_byte_array())
+	data.append_array(PackedInt32Array([
+		maze.atlas_dim.x, maze.atlas_dim.y,
+		maze.cell_size,
+		0,
+	]).to_byte_array())
 	
 	for tile in maze.get_tiles():
 		data.append_array(_tile_to_byte_array(tile))
 		
 	_build_storage_buffer_uniform(data, 2)
+
+
+func _build_tilemap_atlas_uniform():
+	var image := tilemap_atlas.get_image()
+	image.convert(Image.FORMAT_RGBA8) # RGBA required for sampler texture
+	
+	var image_size := image.get_size()
+	
+	var fmt := RDTextureFormat.new()
+	fmt.width = image_size.x;
+	fmt.height = image_size.y;
+	fmt.usage_bits = RenderingDevice.TEXTURE_USAGE_CAN_UPDATE_BIT | RenderingDevice.TEXTURE_USAGE_SAMPLING_BIT
+	fmt.format = RenderingDevice.DATA_FORMAT_R8G8B8A8_SRGB
+	
+	var sampler = rd.sampler_create(RDSamplerState.new())
+	var atlas_texture = rd.texture_create(fmt, RDTextureView.new(), [image.get_data()])
+
+	var uniform := RDUniform.new()
+	uniform.uniform_type = RenderingDevice.UNIFORM_TYPE_SAMPLER_WITH_TEXTURE
+	uniform.binding = 3 
+	uniform.add_id(sampler)
+	uniform.add_id(atlas_texture)
+	
+	uniforms[3] = uniform
 
 
 func _build_storage_buffer_uniform(bytes : PackedByteArray, binding : int):
@@ -112,7 +143,7 @@ func _rect2i_to_byte_array(rect : Rect2i) -> PackedByteArray:
 
 
 func _tile_to_byte_array(tile : Maze.Tile) -> PackedByteArray:
-	return PackedInt32Array([tile.atlas_coords]).to_byte_array()
+	return PackedInt32Array([tile.atlas_coords.x, tile.atlas_coords.y]).to_byte_array()
 
 
 func _render_frame():	
