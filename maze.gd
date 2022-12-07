@@ -17,12 +17,12 @@ class Tile extends Resource:
 func _draw():
 	var bounds := get_used_rect()
 	
-	var tl := bounds.position * cell_size
-	var tr := Vector2(bounds.end.x, bounds.position.y) * cell_size
-	var bl := Vector2(bounds.position.x, bounds.end.y) * cell_size
-	var br := bounds.end * cell_size
+	var top_left := bounds.position * cell_size
+	var top_right := Vector2(bounds.end.x, bounds.position.y) * cell_size
+	var bottom_left := Vector2(bounds.position.x, bounds.end.y) * cell_size
+	var bottom_right := bounds.end * cell_size
 	
-	draw_colored_polygon([tl, tr, br, bl], floor_colour)
+	draw_colored_polygon([top_left, top_right, bottom_right, bottom_left], floor_colour)
 
 
 func get_tiles() -> Array[Tile]:

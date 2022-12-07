@@ -22,9 +22,6 @@ func _ready():
 	
 	
 func _recreate_texture():
-	if rd == null:
-		return
-	
 	canvas_size = get_viewport_rect().size
 	
 	var image := Image.create(canvas_size.x, canvas_size.y, false, Image.FORMAT_RGBAF)
@@ -149,5 +146,7 @@ func _render_frame():
 
 
 func _on_resized():
-	# _recreate_texture() # TODO: resolve bottle neck for large images
-	pass
+	if rd == null:
+		return
+	
+	#_recreate_texture() # TODO: resolve bottle neck for large images

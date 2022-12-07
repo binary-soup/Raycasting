@@ -9,7 +9,7 @@ class_name Player
 @export var fov := PI/6
 @export var far_plane := 300.0
 
-const view_cone_image_size := Vector2i(768, 512) 
+const view_cone_image_size := Vector2(768, 512) 
 
 
 func _ready():
