@@ -16,6 +16,7 @@ grow_vertical = 2
 script = ExtResource("1_7qaav")
 
 [node name="Canvas" parent="." instance=ExtResource("2_koy5b")]
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -28,6 +29,7 @@ player_path = NodePath("../SubViewportContainer/MiniMap/Player")
 maze_path = NodePath("../SubViewportContainer/MiniMap/Maze")
 
 [node name="SubViewportContainer" type="SubViewportContainer" parent="."]
+layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
@@ -49,6 +51,7 @@ render_target_update_mode = 4
 current = true
 
 [node name="FPSLabel" type="Label" parent="."]
+layout_mode = 0
 offset_right = 43.0
 offset_bottom = 26.0
 text = "FPS: ?"

@@ -7,9 +7,6 @@ class_name Canvas
 @export_node_path(Maze) var maze_path
 @onready var maze : Maze = get_node(maze_path)
 
-@export var ceiling_colour := Color.CADET_BLUE
-@export var floor_colour := Color.BURLYWOOD
-
 var rd : RenderingDevice
 var shader : RID
 var pipeline : RID
@@ -46,7 +43,7 @@ func _process(_delta : float):
 
 func _init_compute():
 	rd = RenderingServer.create_local_rendering_device()
-	uniforms = [null, null, null, null]
+	uniforms = [null, null, null]
 	
 	# init shader and pipeline
 	var spirv := preload("res://raycasting.glsl").get_spirv()
@@ -55,7 +52,6 @@ func _init_compute():
 	
 	# create data uniforms that don't change
 	_build_tilemap_uniform()
-	_build_params_uniform()
 
 
 func _build_canvas_texture_uniform(image : Image):
@@ -87,25 +83,18 @@ func _build_camera_data_uniform():
 
 
 func _build_tilemap_uniform():
-	var data : PackedByteArray = PackedInt32Array([
-		maze.num_atlas_cols,
-		maze.cell_size,
-	]).to_byte_array()
+	var data : PackedByteArray = []
+	
+	data.append_array(_colour_to_byte_array(maze.ceiling_colour))
+	data.append_array(_colour_to_byte_array(maze.floor_colour))
 	
 	data.append_array(_rect2i_to_byte_array(maze.get_used_rect()))
+	data.append_array(PackedInt32Array([maze.num_atlas_cols, maze.cell_size,]).to_byte_array())
 	
 	for tile in maze.get_tiles():
 		data.append_array(_tile_to_byte_array(tile))
 		
 	_build_storage_buffer_uniform(data, 2)
-
-
-func _build_params_uniform():	
-	var data : PackedByteArray = []
-	data.append_array(_colour_to_byte_array(ceiling_colour))
-	data.append_array(_colour_to_byte_array(floor_colour))
-	
-	_build_storage_buffer_uniform(data, 3)
 
 
 func _build_storage_buffer_uniform(bytes : PackedByteArray, binding : int):
@@ -129,7 +118,7 @@ func _tile_to_byte_array(tile : Maze.Tile) -> PackedByteArray:
 	return PackedInt32Array([tile.atlas_coords]).to_byte_array()
 
 
-func _render_frame():
+func _render_frame():	
 	# start recording compute commands
 	var compute_list := rd.compute_list_begin()
 	

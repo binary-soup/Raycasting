@@ -1,20 +1,23 @@
 extends CharacterBody2D
 class_name Player
 
+@onready var hit_box := $CollisionShape2D
+@onready var view_cone := $ViewCone
+
 @export var move_speed := 50
 @export var rotate_speed := PI/3
 @export var fov := PI/6
 @export var far_plane := 300.0
 
+const view_cone_image_size := Vector2i(768, 512) 
+
+
+func _ready():
+	view_cone.scale = Vector2(tan(fov) * far_plane / (view_cone_image_size.x / 2), far_plane / view_cone_image_size.y)
+	
 
 func _draw():
-	var c := Color.YELLOW
-	c.a = 0.5
-	
-	var z := far_plane * tan(fov)
-	draw_colored_polygon([Vector2(), Vector2(-z, -far_plane), Vector2(z, -far_plane)], c)
-	
-	draw_circle(Vector2(), 5, Color.BLACK)
+	draw_circle(Vector2(), hit_box.shape.radius, Color.BLACK)
 
 
 func _process(delta : float):

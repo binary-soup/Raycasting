@@ -23,18 +23,14 @@ struct Rect2i {
 };
 
 layout(set = 0, binding = 2, std430) restrict buffer Tilemap {
+    vec4 ceil_colour;
+    vec4 floor_colour;
+    Rect2i dim;
     int num_atlas_cols;
     int cell_size;
-    Rect2i dim;
     Tile[] tiles;
 }
 tilemap;
-
-layout(set = 0, binding = 3, std430) restrict buffer Params {
-    vec4 ceil_colour;
-    vec4 floor_colour;
-}
-params;
 
 struct Ray {
     vec2 pos;
@@ -56,6 +52,12 @@ const vec2 UP = vec2(0.0, -1.0);
 const vec2 STEP_OFFSET = vec2(0.01);
 
 //============================
+
+ivec2 canvas_size;
+int max_wall_height;
+
+int tilemap_num_cols;
+int tilemap_index_offset;
 
 mat2 rotation(float a) {
 	float s = sin(a);
@@ -135,11 +137,8 @@ Tile get_tile(vec2 point) {
     int x = clamp(int(floor(point.x / tilemap.cell_size)), tilemap.dim.start.x, tilemap.dim.end.x);
     int y = clamp(int(floor(point.y / tilemap.cell_size)), tilemap.dim.start.y, tilemap.dim.end.y);
 
-    int num_cols = tilemap.dim.end.x - tilemap.dim.start.x;
-    int index_offset = tilemap.dim.start.y * num_cols + tilemap.dim.start.x;
-
-    int index = y * num_cols + x;
-    return tilemap.tiles[index - index_offset];
+    int index = y * tilemap_num_cols + x;
+    return tilemap.tiles[index - tilemap_index_offset];
 }
 
 RayHit raycast(float angle) {
@@ -154,7 +153,8 @@ RayHit raycast(float angle) {
         hit.point = calc_intersection_point(ray);
 
         hit.dist = length(hit.point - origin) * cos(angle);
-        if (hit.dist > camera_data.far_plane) {
+        if (hit.dist > min(max_wall_height, camera_data.far_plane)) {
+            hit.dist = max_wall_height + 1;
             return hit;
         }
 
@@ -189,26 +189,21 @@ void draw_coloured_line(int start, int end, vec4 colour) {
 }
 
 void draw_wall(RayHit ray) {
-    int canvas_height = imageSize(canvas).y;
+    int mid_point = canvas_size.y / 2;
+    int height = int(floor(max_wall_height / ray.dist));
 
-    int mid_point = canvas_height / 2;
-    int height = int(floor(canvas_height / 2 / ray.dist * tilemap.cell_size));
-
-    draw_coloured_line(0, mid_point - height, params.ceil_colour);
-    draw_coloured_line(mid_point + height, canvas_height, params.floor_colour);
-
-    if (ray.atlas_coords >= 0) {
-        draw_coloured_line(mid_point - height, mid_point + height, get_atlas_colour(ray.atlas_coords));
-    }
+    draw_coloured_line(0, mid_point - height, tilemap.ceil_colour);
+    draw_coloured_line(mid_point - height, mid_point + height, get_atlas_colour(ray.atlas_coords));
+    draw_coloured_line(mid_point + height, canvas_size.y, tilemap.floor_colour);
 }
 
 void main() {
-    float canvas_width = imageSize(canvas).x;
+    canvas_size = imageSize(canvas);
+    max_wall_height = canvas_size.y / 2 * tilemap.cell_size;
 
-    // RayHit ray;
-    // ray.dist = 25000.0 / gl_GlobalInvocationID.x;
-    // ray.atlas_coords = 3;
+    tilemap_num_cols = tilemap.dim.end.x - tilemap.dim.start.x;
+    tilemap_index_offset = tilemap.dim.start.y * tilemap_num_cols + tilemap.dim.start.x;
 
-    RayHit ray = raycast(lerp(camera_data.fov, -camera_data.fov, gl_GlobalInvocationID.x / canvas_width));
+    RayHit ray = raycast(lerp(camera_data.fov, -camera_data.fov, float(gl_GlobalInvocationID.x) / canvas_size.x));
     draw_wall(ray);
 }

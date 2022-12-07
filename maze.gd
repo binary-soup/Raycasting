@@ -1,6 +1,9 @@
 extends TileMap
 class_name Maze
 
+@export var ceiling_colour := Color.CADET_BLUE
+@export var floor_colour := Color.BURLYWOOD
+
 const num_atlas_cols := 2
 const cell_size := 16
 
@@ -9,6 +12,17 @@ class Tile extends Resource:
 	
 	func _init(coords : Vector2i):
 		atlas_coords = coords.y * num_atlas_cols + coords.x
+
+
+func _draw():
+	var bounds := get_used_rect()
+	
+	var tl := bounds.position * cell_size
+	var tr := Vector2(bounds.end.x, bounds.position.y) * cell_size
+	var bl := Vector2(bounds.position.x, bounds.end.y) * cell_size
+	var br := bounds.end * cell_size
+	
+	draw_colored_polygon([tl, tr, br, bl], floor_colour)
 
 
 func get_tiles() -> Array[Tile]:
