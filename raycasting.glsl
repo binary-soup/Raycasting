@@ -220,12 +220,13 @@ void draw_wall(RayHit ray) {
 
 void main() {
     canvas_size = imageSize(canvas);
-    max_wall_height = int(canvas_size.y / 2 * tilemap.cell_size * 1.75);
+    max_wall_height = canvas_size.y / 2 * tilemap.cell_size;
 
     tilemap_num_cols = tilemap.dim.end.x - tilemap.dim.start.x;
     tilemap_index_offset = tilemap.dim.start.y * tilemap_num_cols + tilemap.dim.start.x;
 
-    // TODO: fix warping caused by tan curve
-    RayHit ray = raycast(lerp(camera_data.fov, -camera_data.fov, float(gl_GlobalInvocationID.x) / canvas_size.x));
+    float x = lerp(tan(camera_data.fov), tan(-camera_data.fov), float(gl_GlobalInvocationID.x) / canvas_size.x);
+    RayHit ray = raycast(atan(x));
+
     draw_wall(ray);
 }
