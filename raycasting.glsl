@@ -46,6 +46,7 @@ struct Ray {
 struct RayHit {
     vec2 point;
     float dist;
+    float u;
     ivec2 atlas_coords;
 };
 
@@ -92,6 +93,10 @@ Rect2 new_rect(vec2 start, vec2 size) {
 
 //============================
 
+float calc_u(float start, float end, float point) {
+    return (point - start) / (end - start);
+}
+
 vec2 intersect_horizontal_line(float y, float slope, vec2 pos) {
     float initial = -slope * pos.x + pos.y;
     return vec2((y - initial) / slope, y);
@@ -102,44 +107,55 @@ vec2 intersect_vertical_line(float x, float slope, vec2 pos) {
     return vec2(x, (x - initial) * slope);
 }
 
-vec2 calc_intersection_point(Ray ray) {
+RayHit calc_intersection(Ray ray) {
     Rect2 cell = new_rect(floor_vec(ray.pos / tilemap.cell_size) * tilemap.cell_size - STEP_OFFSET, vec2(tilemap.cell_size) + STEP_OFFSET);
-    
+    RayHit hit;
+
     if (ray.dir.y == -1.0) {
-        return vec2(ray.pos.x, cell.start.y);
+        hit.point = vec2(ray.pos.x, cell.start.y);
+        hit.u = calc_u(cell.start.x, cell.end.x, hit.point.x);
+        return hit;
     }
 
     if (ray.dir.y == 1.0) {
-        return vec2(ray.pos.x, cell.end.y);
+        hit.point = vec2(ray.pos.x, cell.end.y);
+        hit.u = calc_u(cell.end.x, cell.start.x, hit.point.x);
+        return hit;
     }
 
     if (ray.dir.x == -1.0) {
-        return vec2(cell.start.x, ray.pos.y);
+        hit.point = vec2(cell.start.x, ray.pos.y);
+        hit.u = calc_u(cell.end.y, cell.start.y, hit.point.y);
+        return hit;
     }
 
     if (ray.dir.x == 1.0) {
-        return vec2(cell.end.x, ray.pos.y);
+        hit.point = vec2(cell.end.x, ray.pos.y);
+        hit.u = calc_u(cell.start.y, cell.end.y, hit.point.y);
+        return hit;
     }
 
-    vec2 point;
     float slope = ray.dir.y / ray.dir.x;
 
     if (ray.dir.y < 0) {
-        point = intersect_horizontal_line(cell.start.y, slope, ray.pos);
+        hit.point = intersect_horizontal_line(cell.start.y, slope, ray.pos);
+        hit.u = calc_u(cell.start.x, cell.end.x, hit.point.x);
     }
     else {
-        point = intersect_horizontal_line(cell.end.y, slope, ray.pos);
+        hit.point = intersect_horizontal_line(cell.end.y, slope, ray.pos);
+        hit.u = calc_u(cell.end.x, cell.start.x, hit.point.x);
     }
 
-    if (point.x < cell.start.x) {
-        return intersect_vertical_line(cell.start.x, slope, ray.pos);
+    if (hit.point.x < cell.start.x) {
+        hit.point = intersect_vertical_line(cell.start.x, slope, ray.pos);
+        hit.u = calc_u(cell.end.y, cell.start.y, hit.point.y);
+    }
+    else if (hit.point.x > cell.end.x) {
+        hit.point = intersect_vertical_line(cell.end.x, slope, ray.pos);
+        hit.u = calc_u(cell.start.y, cell.end.y, hit.point.y);
     }
 
-    if (point.x > cell.end.x) {
-        return intersect_vertical_line(cell.end.x, slope, ray.pos);
-    }
-
-    return point;
+    return hit;
 }
 
 
@@ -159,8 +175,7 @@ RayHit raycast(float angle) {
     vec2 origin = ray.pos;
 
     while (true) {
-        RayHit hit;
-        hit.point = calc_intersection_point(ray);
+        RayHit hit = calc_intersection(ray);
 
         hit.dist = length(hit.point - origin) * cos(angle);
         if (hit.dist > min(max_wall_height, camera_data.far_plane)) {
@@ -199,17 +214,18 @@ void draw_wall(RayHit ray) {
     int height = int(floor(max_wall_height / ray.dist));
 
     draw_coloured_line(0, mid_point - height, tilemap.ceil_colour);
-    draw_textured_line(mid_point - height, mid_point + height, 0.0, ray.atlas_coords); // TODO: read u from ray
+    draw_textured_line(mid_point - height, mid_point + height, ray.u, ray.atlas_coords);
     draw_coloured_line(mid_point + height, canvas_size.y, tilemap.floor_colour);
 }
 
 void main() {
     canvas_size = imageSize(canvas);
-    max_wall_height = canvas_size.y / 2 * tilemap.cell_size;
+    max_wall_height = int(canvas_size.y / 2 * tilemap.cell_size * 1.75);
 
     tilemap_num_cols = tilemap.dim.end.x - tilemap.dim.start.x;
     tilemap_index_offset = tilemap.dim.start.y * tilemap_num_cols + tilemap.dim.start.x;
 
+    // TODO: fix warping caused by tan curve
     RayHit ray = raycast(lerp(camera_data.fov, -camera_data.fov, float(gl_GlobalInvocationID.x) / canvas_size.x));
     draw_wall(ray);
 }
