@@ -7,6 +7,8 @@ class_name Canvas
 @export_node_path(Maze) var maze_path
 @onready var maze : Maze = get_node(maze_path)
 
+@export var use_stretch := false
+
 var rd : RenderingDevice
 var shader : RID
 var pipeline : RID
@@ -40,7 +42,7 @@ func _process(_delta : float):
 
 func _init_compute():
 	rd = RenderingServer.create_local_rendering_device()
-	uniforms = [null, null, null, null, null]
+	uniforms = [null, null, null, null, null, null]
 	
 	# init shader and pipeline
 	var spirv := preload("res://raycasting.glsl").get_spirv()
@@ -49,7 +51,8 @@ func _init_compute():
 	
 	# create data uniforms that don't change
 	_build_tilemap_uniform()
-	_build_tilemap_atlas_uniform()
+	_build_sampler_texture_uniform(maze.tilemap_atlas, 3)
+	_build_sampler_texture_uniform(maze.tilemap_normal_map, 4)
 	_build_light_data_uniform()
 
 
@@ -98,30 +101,6 @@ func _build_tilemap_uniform():
 		data.append_array(_tile_to_byte_array(tile))
 		
 	_build_storage_buffer_uniform(data, 2)
-
-
-func _build_tilemap_atlas_uniform():
-	var image := maze.tilemap_atlas.get_image()
-	image.convert(Image.FORMAT_RGBA8) # RGBA required for sampler texture
-	
-	var image_size := image.get_size()
-	
-	var fmt := RDTextureFormat.new()
-	fmt.width = image_size.x;
-	fmt.height = image_size.y;
-	fmt.usage_bits = RenderingDevice.TEXTURE_USAGE_CAN_UPDATE_BIT | RenderingDevice.TEXTURE_USAGE_SAMPLING_BIT
-	fmt.format = RenderingDevice.DATA_FORMAT_R8G8B8A8_SRGB
-	
-	var sampler = rd.sampler_create(RDSamplerState.new())
-	var atlas_texture = rd.texture_create(fmt, RDTextureView.new(), [image.get_data()])
-
-	var uniform := RDUniform.new()
-	uniform.uniform_type = RenderingDevice.UNIFORM_TYPE_SAMPLER_WITH_TEXTURE
-	uniform.binding = 3 
-	uniform.add_id(sampler)
-	uniform.add_id(atlas_texture)
-	
-	uniforms[3] = uniform
 	
 
 func _build_light_data_uniform():
@@ -138,7 +117,7 @@ func _build_light_data_uniform():
 	for light in maze.get_lights():
 		data.append_array(_light_to_byte_array(light))
 	
-	_build_storage_buffer_uniform(data, 4)
+	_build_storage_buffer_uniform(data, 5)
 
 
 func _build_storage_buffer_uniform(bytes : PackedByteArray, binding : int):
@@ -146,6 +125,30 @@ func _build_storage_buffer_uniform(bytes : PackedByteArray, binding : int):
 	uniform.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
 	uniform.binding = binding
 	uniform.add_id(rd.storage_buffer_create(bytes.size(), bytes))
+	
+	uniforms[binding] = uniform
+	
+
+func _build_sampler_texture_uniform(tex : Texture2D, binding : int):
+	var image := tex.get_image()
+	image.convert(Image.FORMAT_RGBA8) # RGBA required for sampler texture
+	
+	var image_size := image.get_size()
+	
+	var fmt := RDTextureFormat.new()
+	fmt.width = image_size.x;
+	fmt.height = image_size.y;
+	fmt.usage_bits = RenderingDevice.TEXTURE_USAGE_CAN_UPDATE_BIT | RenderingDevice.TEXTURE_USAGE_SAMPLING_BIT
+	fmt.format = RenderingDevice.DATA_FORMAT_R8G8B8A8_SRGB
+	
+	var sampler = rd.sampler_create(RDSamplerState.new())
+	var atlas_texture = rd.texture_create(fmt, RDTextureView.new(), [image.get_data()])
+
+	var uniform := RDUniform.new()
+	uniform.uniform_type = RenderingDevice.UNIFORM_TYPE_SAMPLER_WITH_TEXTURE
+	uniform.binding = binding
+	uniform.add_id(sampler)
+	uniform.add_id(atlas_texture)
 	
 	uniforms[binding] = uniform
 	
@@ -206,7 +209,7 @@ func _render_frame():
 
 
 func _on_resized():
-	if rd == null:
+	if rd == null or use_stretch:
 		return
 	
-	#_recreate_texture() # TODO: resolve bottle neck for large images
+	_recreate_texture() # TODO: resolve bottle neck for large images

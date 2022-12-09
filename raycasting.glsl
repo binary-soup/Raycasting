@@ -38,6 +38,8 @@ tilemap;
 
 layout(set = 0, binding = 3) uniform sampler2D tilemap_atlas;
 
+layout(set = 0, binding = 4) uniform sampler2D tilemap_normal_map;
+
 struct PointLight {
     vec4 colour;
     vec2 position;
@@ -45,7 +47,7 @@ struct PointLight {
     float pad;
 };
 
-layout(set = 0, binding = 4, std430) restrict buffer LightData {
+layout(set = 0, binding = 5, std430) restrict buffer LightData {
     vec4 ambient;
     vec3 att;
     int num_lights;
@@ -61,7 +63,7 @@ struct RayHit {
     vec2 point;
     float dist;
     float u;
-    vec2 normal;
+    vec3 normal;
     ivec2 atlas_coords;
 };
 
@@ -70,11 +72,12 @@ struct Rect2 {
     vec2 end;
 };
 
-const vec2 UP = vec2(0.0, -1.0);
-const vec2 DOWN = vec2(0.0, 1.0);
-const vec2 LEFT = vec2(-1.0, 0.0);
-const vec2 RIGHT = vec2(1.0, 0.0);
 const vec2 STEP_OFFSET = vec2(0.01);
+const vec3 UP = vec3(0.0, -1.0, 0.0);
+const vec3 DOWN = vec3(0.0, 1.0, 0.0);
+const vec3 LEFT = vec3(-1.0, 0.0, 0.0);
+const vec3 RIGHT = vec3(1.0, 0.0, 0.0);
+const vec3 TANGENT = vec3(0.0, 0.0, 1.0);
 
 //============================
 
@@ -195,7 +198,7 @@ Tile get_tile(vec2 point) {
 RayHit raycast(float angle) {
     Ray ray;
     ray.pos = camera_data.origin;
-    ray.dir = rotation(angle - camera_data.rotation) * UP;
+    ray.dir = rotation(angle - camera_data.rotation) * vec2(0.0, -1.0);
 
     vec2 origin = ray.pos;
 
@@ -223,7 +226,14 @@ void draw_coloured_line(int start, int end, vec4 colour) {
     }
 }
 
-vec4 calc_light_colour(RayHit ray, float v) {
+vec3 sample_normal_vector(vec3 normal, vec2 uv) {
+    vec3 b = cross(normal, TANGENT);
+    mat3 tbn = mat3(TANGENT.x, TANGENT.y, TANGENT.z, b.x, b.y, b.z, normal.x, normal.y, normal.z);
+
+    return tbn * (2 * texture(tilemap_normal_map, uv).xyz - 1.0);
+}
+
+vec4 calc_light_colour(RayHit ray, vec2 uv, float v) {
     vec4 colour = light_data.ambient;
 
     for (int i = 0; i < light_data.num_lights; i++) {
@@ -235,8 +245,11 @@ vec4 calc_light_colour(RayHit ray, float v) {
         vec3 light_vec = light_pos - point;
         float len = length(light_vec);
 
-        vec3 normal = vec3(ray.normal.x, ray.normal.y, 0.0);
-        colour += max(dot(light_vec / len, normal), 0) * light.colour / dot(light_data.att, vec3(1.0, len, len * len));
+        // if (len > 24.0) {
+        //     continue;
+        // }
+
+        colour += max(dot(light_vec / len, sample_normal_vector(ray.normal, uv)), 0) * light.colour / dot(light_data.att, vec3(1.0, len, len * len));
     }
 
     return colour;
@@ -248,9 +261,9 @@ void draw_textured_line(int start, int end, RayHit ray) {
     for (int y = start; y < end; y++) {
         float v = lerp(0.0, 1.0, float(y - start) / (end - start));
 
-        vec4 light_colour = calc_light_colour(ray, v);
-
         vec2 uv = lerp_vec2(offset * ray.atlas_coords, offset * (ray.atlas_coords + ivec2(1)), vec2(ray.u, v));
+        vec4 light_colour = calc_light_colour(ray, uv, v);
+
         imageStore(canvas, ivec2(gl_GlobalInvocationID.x, y), texture(tilemap_atlas, uv) * light_colour);
     }
 }

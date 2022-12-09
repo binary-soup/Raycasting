@@ -6,6 +6,7 @@ class_name Maze
 @export var ceiling_colour := Color.CADET_BLUE
 @export var floor_colour := Color.BURLYWOOD
 @export var tilemap_atlas : Texture2D
+@export var tilemap_normal_map : Texture2D
 @export var ambient_colour : Color
 @export var light_att : Vector3
 

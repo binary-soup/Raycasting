@@ -5,6 +5,7 @@
 [node name="Canvas" type="TextureRect"]
 offset_right = 40.0
 offset_bottom = 40.0
+stretch_mode = 5
 script = ExtResource("1_6suj1")
 
 [connection signal="resized" from="." to="." method="_on_resized"]
