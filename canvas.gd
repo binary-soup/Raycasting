@@ -7,8 +7,6 @@ class_name Canvas
 @export_node_path(Maze) var maze_path
 @onready var maze : Maze = get_node(maze_path)
 
-@export var tilemap_atlas : Texture2D
-
 var rd : RenderingDevice
 var shader : RID
 var pipeline : RID
@@ -42,7 +40,7 @@ func _process(_delta : float):
 
 func _init_compute():
 	rd = RenderingServer.create_local_rendering_device()
-	uniforms = [null, null, null, null]
+	uniforms = [null, null, null, null, null]
 	
 	# init shader and pipeline
 	var spirv := preload("res://raycasting.glsl").get_spirv()
@@ -52,6 +50,7 @@ func _init_compute():
 	# create data uniforms that don't change
 	_build_tilemap_uniform()
 	_build_tilemap_atlas_uniform()
+	_build_light_data_uniform()
 
 
 func _build_canvas_texture_uniform(image : Image):
@@ -102,7 +101,7 @@ func _build_tilemap_uniform():
 
 
 func _build_tilemap_atlas_uniform():
-	var image := tilemap_atlas.get_image()
+	var image := maze.tilemap_atlas.get_image()
 	image.convert(Image.FORMAT_RGBA8) # RGBA required for sampler texture
 	
 	var image_size := image.get_size()
@@ -123,6 +122,23 @@ func _build_tilemap_atlas_uniform():
 	uniform.add_id(atlas_texture)
 	
 	uniforms[3] = uniform
+	
+
+func _build_light_data_uniform():
+	var data : PackedByteArray = []
+	
+	data.append_array(_colour_to_byte_array(maze.ambient_colour))
+	data.append_array(PackedFloat32Array([
+		maze.light_att.x, maze.light_att.y, maze.light_att.z,
+	]).to_byte_array())
+	data.append_array(PackedInt32Array([
+		maze.get_light_count(),
+	]).to_byte_array())
+	
+	for light in maze.get_lights():
+		data.append_array(_light_to_byte_array(light))
+	
+	_build_storage_buffer_uniform(data, 4)
 
 
 func _build_storage_buffer_uniform(bytes : PackedByteArray, binding : int):
@@ -144,6 +160,19 @@ func _rect2i_to_byte_array(rect : Rect2i) -> PackedByteArray:
 
 func _tile_to_byte_array(tile : Maze.Tile) -> PackedByteArray:
 	return PackedInt32Array([tile.atlas_coords.x, tile.atlas_coords.y]).to_byte_array()
+	
+
+func _light_to_byte_array(light : MazeLight) -> PackedByteArray:
+	var data : PackedByteArray = []
+	
+	data.append_array(_colour_to_byte_array(light.color))
+	data.append_array(PackedFloat32Array([
+		light.position.x, light.position.y,
+		light.z_offset,
+		0.0,
+	]).to_byte_array())
+	
+	return data
 
 
 func _render_frame():	

@@ -1,8 +1,13 @@
 extends TileMap
 class_name Maze
 
+@onready var lights_node := $Lights
+
 @export var ceiling_colour := Color.CADET_BLUE
 @export var floor_colour := Color.BURLYWOOD
+@export var tilemap_atlas : Texture2D
+@export var ambient_colour : Color
+@export var light_att : Vector3
 
 const atlas_dim := Vector2i(2, 2)
 const cell_size := 16
@@ -34,6 +39,14 @@ func get_tiles() -> Array[Tile]:
 			tiles.append(_new_tile(Vector2i(x, y)))
 	
 	return tiles
+
+
+func get_light_count() -> int:
+	return lights_node.get_child_count()
+
+
+func get_lights() -> Array:
+	return lights_node.get_children()
 
 
 func _new_tile(pos : Vector2i) -> Tile:

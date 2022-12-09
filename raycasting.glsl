@@ -38,6 +38,20 @@ tilemap;
 
 layout(set = 0, binding = 3) uniform sampler2D tilemap_atlas;
 
+struct PointLight {
+    vec4 colour;
+    vec2 position;
+    float z_offset;
+    float pad;
+};
+
+layout(set = 0, binding = 4, std430) restrict buffer LightData {
+    vec4 ambient;
+    vec3 att;
+    int num_lights;
+    PointLight[] lights;
+} light_data;
+
 struct Ray {
     vec2 pos;
     vec2 dir;
@@ -47,6 +61,7 @@ struct RayHit {
     vec2 point;
     float dist;
     float u;
+    vec2 normal;
     ivec2 atlas_coords;
 };
 
@@ -56,6 +71,9 @@ struct Rect2 {
 };
 
 const vec2 UP = vec2(0.0, -1.0);
+const vec2 DOWN = vec2(0.0, 1.0);
+const vec2 LEFT = vec2(-1.0, 0.0);
+const vec2 RIGHT = vec2(1.0, 0.0);
 const vec2 STEP_OFFSET = vec2(0.01);
 
 //============================
@@ -114,24 +132,28 @@ RayHit calc_intersection(Ray ray) {
     if (ray.dir.y == -1.0) {
         hit.point = vec2(ray.pos.x, cell.start.y);
         hit.u = calc_u(cell.start.x, cell.end.x, hit.point.x);
+        hit.normal = DOWN;
         return hit;
     }
 
     if (ray.dir.y == 1.0) {
         hit.point = vec2(ray.pos.x, cell.end.y);
         hit.u = calc_u(cell.end.x, cell.start.x, hit.point.x);
+        hit.normal = UP;
         return hit;
     }
 
     if (ray.dir.x == -1.0) {
         hit.point = vec2(cell.start.x, ray.pos.y);
         hit.u = calc_u(cell.end.y, cell.start.y, hit.point.y);
+        hit.normal = RIGHT;
         return hit;
     }
 
     if (ray.dir.x == 1.0) {
         hit.point = vec2(cell.end.x, ray.pos.y);
         hit.u = calc_u(cell.start.y, cell.end.y, hit.point.y);
+        hit.normal = LEFT;
         return hit;
     }
 
@@ -140,24 +162,27 @@ RayHit calc_intersection(Ray ray) {
     if (ray.dir.y < 0) {
         hit.point = intersect_horizontal_line(cell.start.y, slope, ray.pos);
         hit.u = calc_u(cell.start.x, cell.end.x, hit.point.x);
+        hit.normal = DOWN;
     }
     else {
         hit.point = intersect_horizontal_line(cell.end.y, slope, ray.pos);
         hit.u = calc_u(cell.end.x, cell.start.x, hit.point.x);
+        hit.normal = UP;
     }
 
     if (hit.point.x < cell.start.x) {
         hit.point = intersect_vertical_line(cell.start.x, slope, ray.pos);
         hit.u = calc_u(cell.end.y, cell.start.y, hit.point.y);
+        hit.normal = RIGHT;
     }
     else if (hit.point.x > cell.end.x) {
         hit.point = intersect_vertical_line(cell.end.x, slope, ray.pos);
         hit.u = calc_u(cell.start.y, cell.end.y, hit.point.y);
+        hit.normal = LEFT;
     }
 
     return hit;
 }
-
 
 Tile get_tile(vec2 point) {
     int x = clamp(int(floor(point.x / tilemap.cell_size)), tilemap.dim.start.x, tilemap.dim.end.x);
@@ -198,14 +223,35 @@ void draw_coloured_line(int start, int end, vec4 colour) {
     }
 }
 
-void draw_textured_line(int start, int end, float u, ivec2 atlas_coords) {
+vec4 calc_light_colour(RayHit ray, float v) {
+    vec4 colour = light_data.ambient;
+
+    for (int i = 0; i < light_data.num_lights; i++) {
+        PointLight light = light_data.lights[i];
+
+        vec3 light_pos = vec3(light.position.x, light.position.y, (1.0 - light.z_offset) * tilemap.cell_size);
+        vec3 point = vec3(ray.point.x, ray.point.y, (1.0 - v) * tilemap.cell_size);
+
+        vec3 light_vec = light_pos - point;
+        float len = length(light_vec);
+
+        vec3 normal = vec3(ray.normal.x, ray.normal.y, 0.0);
+        colour += max(dot(light_vec / len, normal), 0) * light.colour / dot(light_data.att, vec3(1.0, len, len * len));
+    }
+
+    return colour;
+}
+
+void draw_textured_line(int start, int end, RayHit ray) {
     vec2 offset = 1.0 / tilemap.atlas_dim;
 
     for (int y = start; y < end; y++) {
         float v = lerp(0.0, 1.0, float(y - start) / (end - start));
 
-        vec2 uv = lerp_vec2(offset * atlas_coords, offset * (atlas_coords + ivec2(1)), vec2(u, v));
-        imageStore(canvas, ivec2(gl_GlobalInvocationID.x, y), texture(tilemap_atlas, uv));
+        vec4 light_colour = calc_light_colour(ray, v);
+
+        vec2 uv = lerp_vec2(offset * ray.atlas_coords, offset * (ray.atlas_coords + ivec2(1)), vec2(ray.u, v));
+        imageStore(canvas, ivec2(gl_GlobalInvocationID.x, y), texture(tilemap_atlas, uv) * light_colour);
     }
 }
 
@@ -214,7 +260,7 @@ void draw_wall(RayHit ray) {
     int height = int(floor(max_wall_height / ray.dist));
 
     draw_coloured_line(0, mid_point - height, tilemap.ceil_colour);
-    draw_textured_line(mid_point - height, mid_point + height, ray.u, ray.atlas_coords);
+    draw_textured_line(mid_point - height, mid_point + height, ray);
     draw_coloured_line(mid_point + height, canvas_size.y, tilemap.floor_colour);
 }
 

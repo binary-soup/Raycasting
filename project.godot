@@ -29,6 +29,11 @@ _global_script_classes=[{
 "language": &"GDScript",
 "path": "res://maze.gd"
 }, {
+"base": "PointLight2D",
+"class": &"MazeLight",
+"language": &"GDScript",
+"path": "res://maze_light.gd"
+}, {
 "base": "CharacterBody2D",
 "class": &"Player",
 "language": &"GDScript",
@@ -39,6 +44,7 @@ _global_script_class_icons={
 "FPSLabel": "",
 "Main": "",
 "Maze": "",
+"MazeLight": "",
 "Player": ""
 }
 
