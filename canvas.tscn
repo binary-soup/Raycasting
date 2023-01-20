@@ -1,8 +1,18 @@
-[gd_scene load_steps=2 format=3 uid="uid://5005s1jul1gw"]
+[gd_scene load_steps=4 format=3 uid="uid://5005s1jul1gw"]
 
 [ext_resource type="Script" path="res://canvas.gd" id="1_6suj1"]
+[ext_resource type="Shader" path="res://canvas.gdshader" id="1_72wgp"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ilxe6"]
+shader = ExtResource("1_72wgp")
+shader_parameter/ceiling_colour = Color(1, 1, 1, 1)
+shader_parameter/floor_colour = null
+shader_parameter/atlas_dimensions = null
+shader_parameter/light_dir = Vector3(0, 0, 1)
+shader_parameter/light_colour = Color(0.6, 0.6, 0.6, 1)
 
 [node name="Canvas" type="TextureRect"]
+material = SubResource("ShaderMaterial_ilxe6")
 offset_right = 40.0
 offset_bottom = 40.0
 stretch_mode = 5

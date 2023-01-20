@@ -13,24 +13,29 @@ var rd : RenderingDevice
 var shader : RID
 var pipeline : RID
 var canvas_texture : RID
+var output_data_texture : RID
 var uniforms : Array[RDUniform]
 
 var canvas_size : Vector2i
+var outpur_data_size : Vector2i
 
 
 func _ready():
+	_init_shader()
 	_init_compute()
 	_recreate_texture()
 	
 	
 func _recreate_texture():
 	canvas_size = get_viewport_rect().size
+	outpur_data_size = Vector2i(canvas_size.x, 2)
 	
 	var image := Image.create(canvas_size.x, canvas_size.y, false, Image.FORMAT_RGBAF)
 	texture = ImageTexture.create_from_image(image)
 	
 	# rebuild canvas texture uniform since its size has changed
 	_build_canvas_texture_uniform(image)
+	_build_output_data_texture_uniform(Image.create(outpur_data_size.x, outpur_data_size.y, false, Image.FORMAT_RGBAF))
 
 
 func _process(_delta : float):
@@ -40,9 +45,18 @@ func _process(_delta : float):
 	_render_frame()
 	
 
+func _init_shader():
+	material.set_shader_parameter("ceiling_colour", maze.ceiling_colour)
+	material.set_shader_parameter("floor_colour", maze.floor_colour)
+	
+	material.set_shader_parameter("atlas_dimensions", maze.atlas_dim)
+	material.set_shader_parameter("tilemap_atlas", maze.tilemap_atlas)
+	material.set_shader_parameter("tilemap_normal_map", maze.tilemap_normal_map)
+
+
 func _init_compute():
 	rd = RenderingServer.create_local_rendering_device()
-	uniforms = [null, null, null, null, null, null]
+	uniforms = [RDUniform.new(), RDUniform.new(), RDUniform.new(), RDUniform.new(), RDUniform.new(), RDUniform.new(), RDUniform.new()]
 	
 	# init shader and pipeline
 	var spirv := preload("res://raycasting.glsl").get_spirv()
@@ -71,6 +85,23 @@ func _build_canvas_texture_uniform(image : Image):
 	canvas_uniform.add_id(canvas_texture)
 	
 	uniforms[0] = canvas_uniform
+	
+
+func _build_output_data_texture_uniform(image : Image):
+	var fmt := RDTextureFormat.new()
+	fmt.width = outpur_data_size.x
+	fmt.height = outpur_data_size.y
+	fmt.format = RenderingDevice.DATA_FORMAT_R32G32B32A32_SFLOAT
+	fmt.usage_bits = RenderingDevice.TEXTURE_USAGE_CAN_UPDATE_BIT | RenderingDevice.TEXTURE_USAGE_STORAGE_BIT | RenderingDevice.TEXTURE_USAGE_CAN_COPY_FROM_BIT
+	
+	output_data_texture = rd.texture_create(fmt, RDTextureView.new(), [image.get_data()])
+	
+	var output_data_uniform := RDUniform.new()
+	output_data_uniform.uniform_type = RenderingDevice.UNIFORM_TYPE_IMAGE
+	output_data_uniform.binding = 6
+	output_data_uniform.add_id(output_data_texture)
+	
+	uniforms[6] = output_data_uniform
 
 
 func _build_camera_data_uniform():
@@ -203,9 +234,13 @@ func _render_frame():
 	rd.sync()
 	
 	# get data from the output texture and update image
-	var data : PackedByteArray = rd.texture_get_data(canvas_texture, 0)
-	var image = Image.create_from_data(canvas_size.x, canvas_size.y, false, Image.FORMAT_RGBAF, data)
-	texture.update(image)
+	#var data : PackedByteArray = rd.texture_get_data(canvas_texture, 0)
+	#var image = Image.create_from_data(canvas_size.x, canvas_size.y, false, Image.FORMAT_RGBAF, data)
+	#texture.update(image)
+	
+	var data : PackedByteArray = rd.texture_get_data(output_data_texture, 0)
+	var image = Image.create_from_data(outpur_data_size.x, outpur_data_size.y, false, Image.FORMAT_RGBAF, data)
+	material.set_shader_parameter("data_texture", ImageTexture.create_from_image(image))
 
 
 func _on_resized():

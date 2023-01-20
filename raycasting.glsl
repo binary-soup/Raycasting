@@ -4,6 +4,7 @@
 layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
 
 layout(rgba32f, binding = 0) uniform image2D canvas;
+layout(rgba32f, binding = 6) uniform image2D output_data;
 
 layout(set = 0, binding = 1, std430) restrict buffer CameraData {
     vec2 origin;
@@ -245,10 +246,6 @@ vec4 calc_light_colour(RayHit ray, vec2 uv, float v) {
         vec3 light_vec = light_pos - point;
         float len = length(light_vec);
 
-        // if (len > 24.0) {
-        //     continue;
-        // }
-
         colour += max(dot(light_vec / len, sample_normal_vector(ray.normal, uv)), 0) * light.colour / dot(light_data.att, vec3(1.0, len, len * len));
     }
 
@@ -287,5 +284,9 @@ void main() {
     float x = lerp(tan(camera_data.fov), tan(-camera_data.fov), float(gl_GlobalInvocationID.x) / canvas_size.x);
     RayHit ray = raycast(atan(x));
 
-    draw_wall(ray);
+    //draw_wall(ray);
+
+    float wall_offset = 1 - floor(max_wall_height / ray.dist) / canvas_size.y * 2;
+    imageStore(output_data, ivec2(gl_GlobalInvocationID.x, 0.0), vec4(wall_offset, ray.u, ray.atlas_coords));
+    imageStore(output_data, ivec2(gl_GlobalInvocationID.x, 1.0), vec4(ray.normal, 0.0));
 }

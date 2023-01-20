@@ -8,52 +8,16 @@
 
 config_version=5
 
-_global_script_classes=[{
-"base": "TextureRect",
-"class": &"Canvas",
-"language": &"GDScript",
-"path": "res://canvas.gd"
-}, {
-"base": "Label",
-"class": &"FPSLabel",
-"language": &"GDScript",
-"path": "res://FPSLabel.gd"
-}, {
-"base": "Control",
-"class": &"Main",
-"language": &"GDScript",
-"path": "res://main.gd"
-}, {
-"base": "TileMap",
-"class": &"Maze",
-"language": &"GDScript",
-"path": "res://maze.gd"
-}, {
-"base": "PointLight2D",
-"class": &"MazeLight",
-"language": &"GDScript",
-"path": "res://maze_light.gd"
-}, {
-"base": "CharacterBody2D",
-"class": &"Player",
-"language": &"GDScript",
-"path": "res://player.gd"
-}]
-_global_script_class_icons={
-"Canvas": "",
-"FPSLabel": "",
-"Main": "",
-"Maze": "",
-"MazeLight": "",
-"Player": ""
-}
-
 [application]
 
 config/name="Raycasting"
 run/main_scene="res://main.tscn"
 config/features=PackedStringArray("4.0", "Mobile")
 config/icon="res://icon.svg"
+
+[editor]
+
+export/convert_text_resources_to_binary=true
 
 [input]
 
