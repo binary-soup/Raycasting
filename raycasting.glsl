@@ -287,6 +287,7 @@ void main() {
     //draw_wall(ray);
 
     float wall_offset = 1 - floor(max_wall_height / ray.dist) / canvas_size.y * 2;
-    imageStore(output_data, ivec2(gl_GlobalInvocationID.x, 0.0), vec4(wall_offset, ray.u, ray.atlas_coords));
-    imageStore(output_data, ivec2(gl_GlobalInvocationID.x, 1.0), vec4(ray.normal, 0.0));
+    imageStore(output_data, ivec2(gl_GlobalInvocationID.x, 0), vec4(wall_offset, ray.u, ray.atlas_coords));
+    imageStore(output_data, ivec2(gl_GlobalInvocationID.x, 1), vec4(ray.point, 0.0, 0.0));
+    imageStore(output_data, ivec2(gl_GlobalInvocationID.x, 2), vec4(ray.normal, 0.0));
 }

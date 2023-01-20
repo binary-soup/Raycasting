@@ -1,15 +1,19 @@
-[gd_scene load_steps=4 format=3 uid="uid://5005s1jul1gw"]
+[gd_scene load_steps=5 format=3 uid="uid://5005s1jul1gw"]
 
 [ext_resource type="Script" path="res://canvas.gd" id="1_6suj1"]
 [ext_resource type="Shader" path="res://canvas.gdshader" id="1_72wgp"]
+[ext_resource type="Texture2D" uid="uid://bmxsti47n15w" path="res://assets/uv_grid_p.png" id="2_8p3u0"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ilxe6"]
 shader = ExtResource("1_72wgp")
+shader_parameter/view_pos = null
+shader_parameter/depth_scale = 0.1
 shader_parameter/ceiling_colour = Color(1, 1, 1, 1)
 shader_parameter/floor_colour = null
 shader_parameter/atlas_dimensions = null
 shader_parameter/light_dir = Vector3(0, 0, 1)
 shader_parameter/light_colour = Color(0.6, 0.6, 0.6, 1)
+shader_parameter/tilemap_parallax_map = ExtResource("2_8p3u0")
 
 [node name="Canvas" type="TextureRect"]
 material = SubResource("ShaderMaterial_ilxe6")

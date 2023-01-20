@@ -17,7 +17,7 @@ var output_data_texture : RID
 var uniforms : Array[RDUniform]
 
 var canvas_size : Vector2i
-var outpur_data_size : Vector2i
+var output_data_size : Vector2i
 
 
 func _ready():
@@ -28,19 +28,20 @@ func _ready():
 	
 func _recreate_texture():
 	canvas_size = get_viewport_rect().size
-	outpur_data_size = Vector2i(canvas_size.x, 2)
+	output_data_size = Vector2i(canvas_size.x, 3)
 	
 	var image := Image.create(canvas_size.x, canvas_size.y, false, Image.FORMAT_RGBAF)
 	texture = ImageTexture.create_from_image(image)
 	
 	# rebuild canvas texture uniform since its size has changed
 	_build_canvas_texture_uniform(image)
-	_build_output_data_texture_uniform(Image.create(outpur_data_size.x, outpur_data_size.y, false, Image.FORMAT_RGBAF))
+	_build_output_data_texture_uniform(Image.create(output_data_size.x, output_data_size.y, false, Image.FORMAT_RGBAF))
 
 
 func _process(_delta : float):
 	# rebuild data uniforms that change every frame
 	_build_camera_data_uniform()
+	material.set_shader_parameter("view_pos", player.position)
 	
 	_render_frame()
 	
@@ -89,8 +90,8 @@ func _build_canvas_texture_uniform(image : Image):
 
 func _build_output_data_texture_uniform(image : Image):
 	var fmt := RDTextureFormat.new()
-	fmt.width = outpur_data_size.x
-	fmt.height = outpur_data_size.y
+	fmt.width = output_data_size.x
+	fmt.height = output_data_size.y
 	fmt.format = RenderingDevice.DATA_FORMAT_R32G32B32A32_SFLOAT
 	fmt.usage_bits = RenderingDevice.TEXTURE_USAGE_CAN_UPDATE_BIT | RenderingDevice.TEXTURE_USAGE_STORAGE_BIT | RenderingDevice.TEXTURE_USAGE_CAN_COPY_FROM_BIT
 	
@@ -239,7 +240,7 @@ func _render_frame():
 	#texture.update(image)
 	
 	var data : PackedByteArray = rd.texture_get_data(output_data_texture, 0)
-	var image = Image.create_from_data(outpur_data_size.x, outpur_data_size.y, false, Image.FORMAT_RGBAF, data)
+	var image = Image.create_from_data(output_data_size.x, output_data_size.y, false, Image.FORMAT_RGBAF, data)
 	material.set_shader_parameter("data_texture", ImageTexture.create_from_image(image))
 
 
