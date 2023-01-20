@@ -1,25 +1,73 @@
-[gd_scene load_steps=5 format=3 uid="uid://5005s1jul1gw"]
+[gd_scene load_steps=7 format=3 uid="uid://5005s1jul1gw"]
 
 [ext_resource type="Script" path="res://canvas.gd" id="1_6suj1"]
 [ext_resource type="Shader" path="res://canvas.gdshader" id="1_72wgp"]
-[ext_resource type="Texture2D" uid="uid://bmxsti47n15w" path="res://assets/uv_grid_p.png" id="2_8p3u0"]
+[ext_resource type="Texture2D" uid="uid://dn20a2vhk0ppr" path="res://assets/bricks.jpg" id="2_kuk8j"]
+[ext_resource type="Texture2D" uid="uid://uyrr7hw16445" path="res://assets/bricks_normal.jpg" id="3_bohdy"]
+[ext_resource type="Texture2D" uid="uid://bnj7k1wwfgn0j" path="res://assets/bricks_disp.jpg" id="4_wodi4"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ilxe6"]
 shader = ExtResource("1_72wgp")
 shader_parameter/view_pos = null
-shader_parameter/depth_scale = 0.1
+shader_parameter/depth_scale = 0.05
 shader_parameter/ceiling_colour = Color(1, 1, 1, 1)
 shader_parameter/floor_colour = null
 shader_parameter/atlas_dimensions = null
-shader_parameter/light_dir = Vector3(0, 0, 1)
 shader_parameter/light_colour = Color(0.6, 0.6, 0.6, 1)
-shader_parameter/tilemap_parallax_map = ExtResource("2_8p3u0")
+shader_parameter/use_normal_mapping = true
+shader_parameter/use_parallax_mapping = true
+shader_parameter/tilemap_atlas = ExtResource("2_kuk8j")
+shader_parameter/tilemap_normal_map = ExtResource("3_bohdy")
+shader_parameter/tilemap_parallax_map = ExtResource("4_wodi4")
 
 [node name="Canvas" type="TextureRect"]
 material = SubResource("ShaderMaterial_ilxe6")
-offset_right = 40.0
-offset_bottom = 40.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 stretch_mode = 5
 script = ExtResource("1_6suj1")
 
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -216.0
+offset_top = -122.0
+offset_right = -14.0
+offset_bottom = -17.0
+grow_horizontal = 0
+grow_vertical = 0
+color = Color(0, 0, 0, 0.588235)
+metadata/_edit_group_ = true
+
+[node name="CenterContainer" type="CenterContainer" parent="ColorRect"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ColorRect/CenterContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="NormalMapping" type="CheckBox" parent="ColorRect/CenterContainer/VBoxContainer"]
+layout_mode = 2
+button_pressed = true
+text = "Normal Mapping"
+
+[node name="ParallaxMapping" type="CheckBox" parent="ColorRect/CenterContainer/VBoxContainer"]
+layout_mode = 2
+button_pressed = true
+text = "Parallax Mapping"
+
 [connection signal="resized" from="." to="." method="_on_resized"]
+[connection signal="toggled" from="ColorRect/CenterContainer/VBoxContainer/NormalMapping" to="." method="_on_normal_mapping_toggled"]
+[connection signal="toggled" from="ColorRect/CenterContainer/VBoxContainer/ParallaxMapping" to="." method="_on_parallax_mapping_toggled"]

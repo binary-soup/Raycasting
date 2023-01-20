@@ -51,8 +51,8 @@ func _init_shader():
 	material.set_shader_parameter("floor_colour", maze.floor_colour)
 	
 	material.set_shader_parameter("atlas_dimensions", maze.atlas_dim)
-	material.set_shader_parameter("tilemap_atlas", maze.tilemap_atlas)
-	material.set_shader_parameter("tilemap_normal_map", maze.tilemap_normal_map)
+	#material.set_shader_parameter("tilemap_atlas", maze.tilemap_atlas)
+	#material.set_shader_parameter("tilemap_normal_map", maze.tilemap_normal_map)
 
 
 func _init_compute():
@@ -249,3 +249,11 @@ func _on_resized():
 		return
 	
 	_recreate_texture() # TODO: resolve bottle neck for large images
+
+
+func _on_normal_mapping_toggled(button_pressed : bool):
+	material.set_shader_parameter("use_normal_mapping", button_pressed)
+
+
+func _on_parallax_mapping_toggled(button_pressed : bool):
+	material.set_shader_parameter("use_parallax_mapping", button_pressed)
