@@ -9,7 +9,8 @@ uniform vec4 ceiling_colour : source_color;
 uniform vec4 floor_colour : source_color;
 
 uniform ivec2 atlas_dimensions;
-uniform sampler2D tilemap_atlas;// : filter_nearest;
+uniform sampler2DArray diffuse_textures;
+
 uniform sampler2D tilemap_normal_map;
 uniform sampler2D tilemap_parallax_map;
 
@@ -19,22 +20,6 @@ uniform bool use_normal_mapping = true;
 uniform bool use_parallax_mapping = true;
 
 const vec3 BITANGENT = vec3(0.0, 0.0, -1.0);
-
-//===================
-
-float lerp(float from, float to, float weight) {
-    return from + (to - from) * weight;
-}
-
-vec2 lerp_vec2(vec2 from, vec2 to, vec2 weight) {
-    return vec2(lerp(from.x, to.x, weight.x), lerp(from.y, to.y, weight.y));
-}
-
-mat2 rotation(float a) {
-	float s = sin(a);
-	float c = cos(a);
-	return mat2(vec2(c, -s), vec2(s, c));
-}
 
 //===================
 
@@ -57,9 +42,6 @@ vec4 draw_floor() {
 }
 
 vec4 draw_wall(vec2 uv, vec2 atlas_coords, vec2 position, vec3 normal) {
-	//vec2 offset = 1.0 / vec2(atlas_dimensions);
-	//uv = lerp_vec2(offset * atlas_coords, offset * (atlas_coords + vec2(1.0)), uv);
-	
 	mat3 tbn = mat3(cross(normal, BITANGENT), BITANGENT, normal);
 	
 	if (use_parallax_mapping) {
@@ -67,7 +49,7 @@ vec4 draw_wall(vec2 uv, vec2 atlas_coords, vec2 position, vec3 normal) {
 		uv = apply_parallax(uv, view_dir);
 	}
 	
-	vec4 colour = texture(tilemap_atlas, uv);
+	vec4 colour = texture(diffuse_textures, vec3(uv, atlas_coords.y * float(atlas_dimensions.y) + atlas_coords.x));
 	vec3 light_dir = normalize(vec3(normal.xy, 1.0)) * tbn;
 	
 	if (use_normal_mapping) {

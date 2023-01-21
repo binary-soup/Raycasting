@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://canvas.gd" id="1_6suj1"]
 [ext_resource type="Shader" path="res://canvas.gdshader" id="1_72wgp"]
-[ext_resource type="Texture2D" uid="uid://dn20a2vhk0ppr" path="res://assets/bricks.jpg" id="2_kuk8j"]
+[ext_resource type="CompressedTexture2DArray" uid="uid://biipvm3s2xoam" path="res://assets/bricks_coloured.jpg" id="2_etgve"]
 [ext_resource type="Texture2D" uid="uid://uyrr7hw16445" path="res://assets/bricks_normal.jpg" id="3_bohdy"]
 [ext_resource type="Texture2D" uid="uid://bnj7k1wwfgn0j" path="res://assets/bricks_disp.jpg" id="4_wodi4"]
 
@@ -16,7 +16,7 @@ shader_parameter/atlas_dimensions = null
 shader_parameter/light_colour = Color(0.6, 0.6, 0.6, 1)
 shader_parameter/use_normal_mapping = true
 shader_parameter/use_parallax_mapping = true
-shader_parameter/tilemap_atlas = ExtResource("2_kuk8j")
+shader_parameter/diffuse_textures = ExtResource("2_etgve")
 shader_parameter/tilemap_normal_map = ExtResource("3_bohdy")
 shader_parameter/tilemap_parallax_map = ExtResource("4_wodi4")
 
