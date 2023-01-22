@@ -28,12 +28,6 @@ layout(set = 0, binding = 2, std430) restrict buffer Tilemap {
 }
 tilemap;
 
-layout(set = 0, binding = 3, std430) restrict buffer Params {
-    ivec2 canvas_size;
-    int cell_size;
-}
-params;
-
 struct Ray {
     vec2 pos;
     vec2 dir;
@@ -52,7 +46,7 @@ struct Rect2 {
     vec2 end;
 };
 
-const vec2 STEP_OFFSET = vec2(0.01);
+const vec2 STEP_OFFSET = vec2(0.001);
 const vec3 UP = vec3(0.0, -1.0, 0.0);
 const vec3 DOWN = vec3(0.0, 1.0, 0.0);
 const vec3 LEFT = vec3(-1.0, 0.0, 0.0);
@@ -60,7 +54,6 @@ const vec3 RIGHT = vec3(1.0, 0.0, 0.0);
 
 //============================
 
-int max_wall_height;
 int tilemap_num_cols;
 int tilemap_index_offset;
 
@@ -102,7 +95,7 @@ vec2 intersect_vertical_line(float x, float slope, vec2 pos) {
 }
 
 RayHit calc_intersection(Ray ray) {
-    Rect2 cell = new_rect(floor_vec(ray.pos / params.cell_size) * params.cell_size - STEP_OFFSET, vec2(params.cell_size) + STEP_OFFSET);
+    Rect2 cell = new_rect(floor_vec(ray.pos) - STEP_OFFSET, vec2(1.0, 1.0) + STEP_OFFSET);
     RayHit hit;
 
     if (ray.dir.y == -1.0) {
@@ -161,8 +154,8 @@ RayHit calc_intersection(Ray ray) {
 }
 
 Tile get_tile(vec2 point) {
-    int x = clamp(int(floor(point.x / params.cell_size)), tilemap.dim.start.x, tilemap.dim.end.x);
-    int y = clamp(int(floor(point.y / params.cell_size)), tilemap.dim.start.y, tilemap.dim.end.y);
+    int x = clamp(int(floor(point.x)), tilemap.dim.start.x, tilemap.dim.end.x);
+    int y = clamp(int(floor(point.y)), tilemap.dim.start.y, tilemap.dim.end.y);
 
     int index = y * tilemap_num_cols + x;
     return tilemap.tiles[index - tilemap_index_offset];
@@ -179,8 +172,8 @@ RayHit raycast(float angle) {
         RayHit hit = calc_intersection(ray);
 
         hit.dist = length(hit.point - origin) * cos(angle);
-        if (hit.dist > min(max_wall_height, camera_data.far_plane)) {
-            hit.dist = max_wall_height + 1;
+        if (hit.dist > camera_data.far_plane) {
+            hit.dist = camera_data.far_plane;
             return hit;
         }
 
@@ -194,17 +187,13 @@ RayHit raycast(float angle) {
 }
 
 void main() {
-    max_wall_height = params.canvas_size.y / 2 * params.cell_size;
-
     tilemap_num_cols = tilemap.dim.end.x - tilemap.dim.start.x;
     tilemap_index_offset = tilemap.dim.start.y * tilemap_num_cols + tilemap.dim.start.x;
 
-    float x = lerp(tan(camera_data.fov), tan(-camera_data.fov), float(gl_GlobalInvocationID.x) / params.canvas_size.x);
+    float x = lerp(tan(camera_data.fov), tan(-camera_data.fov), gl_GlobalInvocationID.x / float(gl_NumWorkGroups * 64));
     RayHit ray = raycast(atan(x));
 
-    float wall_offset = 1 - floor(max_wall_height / ray.dist) / params.canvas_size.y * 2;
-
-    imageStore(output_data, ivec2(gl_GlobalInvocationID.x, 0), vec4(wall_offset, ray.u, ray.texture_index, 0.0));
+    imageStore(output_data, ivec2(gl_GlobalInvocationID.x, 0), vec4(ray.dist, ray.texture_index, ray.u, 0.0));
     imageStore(output_data, ivec2(gl_GlobalInvocationID.x, 1), vec4(ray.point, 0.0, 0.0));
     imageStore(output_data, ivec2(gl_GlobalInvocationID.x, 2), vec4(ray.normal, 0.0));
 }

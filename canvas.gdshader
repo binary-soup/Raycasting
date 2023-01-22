@@ -5,6 +5,9 @@ uniform sampler2D data_texture : filter_nearest;
 uniform vec2 view_pos;
 uniform float depth_scale = 0.1;
 
+uniform float far_plane;
+uniform sampler2D fog_gradient;
+
 uniform vec4 ceiling_colour : source_color;
 uniform vec4 floor_colour : source_color;
 
@@ -17,13 +20,21 @@ uniform vec4 light_colour : source_color = vec4(vec3(0.6), 1.0);
 uniform bool use_normal_mapping = true;
 uniform bool use_parallax_mapping = true;
 
-const vec3 BITANGENT = vec3(0.0, 0.0, -1.0);
+const vec3 BITANGENT = vec3(0.0, 0.0, 1.0);
+
+struct Wall {
+	float dist;
+	float texture_index;
+	vec2 uv;
+	vec2 position;
+	vec3 normal;
+};
 
 //===================
 
 vec2 apply_parallax(vec2 uv, vec3 view_dir) {
 	float depth = texture(depth_map, uv).r;
-	return uv + view_dir.xy / view_dir.z * depth * depth_scale;
+	return uv - view_dir.xy / view_dir.z * depth * depth_scale;
 }
 
 vec3 sample_normal_vector(vec2 uv) {
@@ -38,16 +49,18 @@ vec4 draw_floor() {
 	return floor_colour;
 }
 
-vec4 draw_wall(vec2 uv, float texture_index, vec2 position, vec3 normal) {
-	mat3 tbn = mat3(cross(normal, BITANGENT), BITANGENT, normal);
+vec4 draw_wall(Wall wall) {
+	vec2 uv = wall.uv;
+	vec3 normal = wall.normal;
+	mat3 tbn = mat3(cross(wall.normal, BITANGENT), BITANGENT, normal);
 	
 	if (use_parallax_mapping) {
-		vec3 view_dir = normalize((vec3(view_pos, 0.5) - vec3(position, uv.y))) * tbn;
+		vec3 view_dir = normalize((vec3(view_pos, 0.5) - vec3(wall.position, uv.y))) * tbn;
 		uv = apply_parallax(uv, view_dir);
 	}
 	
-	vec4 colour = texture(diffuse_textures, vec3(uv, texture_index));
-	vec3 light_dir = normalize(vec3(normal.xy, 1.0)) * tbn;
+	vec4 colour = texture(diffuse_textures, vec3(uv, wall.texture_index));
+	vec3 light_dir = normalize(vec3(wall.normal.xy, -1.0)) * tbn;
 	
 	if (use_normal_mapping) {
 		normal = sample_normal_vector(uv);
@@ -64,18 +77,12 @@ vec4 draw_wall(vec2 uv, float texture_index, vec2 position, vec3 normal) {
 
 vec4 calc_colour(vec2 uv) {
 	vec4 data = texture(data_texture, vec2(uv.x, 0.0));
-	float wall_offset = data.r;
 	
-	if (wall_offset >= 1.0) {
-		if (uv.y < 0.5) {
-			return draw_ceiling();
-		}
-		else {
-			return draw_floor();
-		}
-	}
+	Wall wall;
+	wall.dist = data.r;
+	wall.texture_index = data.g;
 	
-	float v = (uv.y - wall_offset / 2.0) / (1.0 - wall_offset);
+	float v = wall.dist * uv.y - wall.dist * 0.5 + 0.5;
 	
 	if (v < 0.0) {
 		return draw_ceiling();
@@ -85,10 +92,15 @@ vec4 calc_colour(vec2 uv) {
 		return draw_floor();
 	}
 	
-	vec2 position = texture(data_texture, vec2(uv.x, 0.5)).rg;
-	vec3 normal = texture(data_texture, vec2(uv.x, 1.0)).rgb;
+	if (wall.dist >= far_plane) {
+		return vec4(1.0);
+	}
 	
-	return draw_wall(vec2(data.g, v), data.b, position, normal);
+	wall.uv = vec2(data.b, v);
+	wall.position = texture(data_texture, vec2(uv.x, 0.5)).rg;
+	wall.normal = texture(data_texture, vec2(uv.x, 1.0)).rgb;
+	
+	return draw_wall(wall) + texture(fog_gradient, vec2(wall.dist / far_plane, 0.0));
 }
 
 void fragment() {

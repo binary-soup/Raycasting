@@ -30,6 +30,7 @@ func _ready():
 func _init_shader_parameters():
 	material.set_shader_parameter("ceiling_colour", maze.ceiling_colour)
 	material.set_shader_parameter("floor_colour", maze.floor_colour)
+	material.set_shader_parameter("far_plane", player.far_plane)
 	
 	material.set_shader_parameter("diffuse_textures", maze.diffuse_textures)
 	material.set_shader_parameter("normal_map", maze.normal_map)
@@ -38,7 +39,7 @@ func _init_shader_parameters():
 
 func _init_compute():
 	rd = RenderingServer.create_local_rendering_device()
-	uniforms = [RDUniform.new(), RDUniform.new(), RDUniform.new(), RDUniform.new()]
+	uniforms = [RDUniform.new(), RDUniform.new(), RDUniform.new()]
 	
 	# init shader and pipeline
 	var spirv := preload("res://raycasting.glsl").get_spirv()
@@ -56,8 +57,6 @@ func _on_resized():
 	canvas_size = get_viewport_rect().size
 	var image := Image.create(canvas_size.x, canvas_size.y, false, Image.FORMAT_RGBAF)
 	texture = ImageTexture.create_from_image(image)
-	
-	_build_params_uniform()
 	
 	output_data_size = Vector2i(canvas_size.x, 3)
 	_build_output_data_texture_uniform()
@@ -87,8 +86,10 @@ func _build_output_data_texture_uniform():
 
 
 func _build_camera_data_uniform():
+	var origin := player.get_origin()
+	
 	var data : PackedByteArray = PackedFloat32Array([
-		player.position.x, player.position.y,
+		origin.x, origin.y,
 		player.rotation,
 		player.fov,
 		player.far_plane,
@@ -106,14 +107,6 @@ func _build_tilemap_uniform():
 		data.append_array(_tile_to_byte_array(tile))
 		
 	_build_storage_buffer_uniform(data, 2)
-
-
-func _build_params_uniform():
-	var data : PackedByteArray = PackedInt32Array([
-		canvas_size.x, canvas_size.y, maze.cell_quadrant_size,
-	]).to_byte_array()
-	
-	_build_storage_buffer_uniform(data, 3)
 
 
 func _build_storage_buffer_uniform(bytes : PackedByteArray, binding : int):
@@ -136,7 +129,7 @@ func _tile_to_byte_array(tile : Maze.Tile) -> PackedByteArray:
 func _calculate_frame():
 	# rebuild data uniforms that change every frame
 	_build_camera_data_uniform()
-	material.set_shader_parameter("view_pos", player.position)
+	material.set_shader_parameter("view_pos", player.get_origin())
 	
 	# start recording compute commands
 	var compute_list := rd.compute_list_begin()

@@ -9,12 +9,12 @@ signal physics_changed
 @export var move_speed := 50
 @export var rotate_speed := PI/3
 @export var fov := PI/4
-@export var far_plane := 300.0
+@export var far_plane := 10.0
 
 
 func _ready():
 	var cone_size : Vector2 = view_cone.texture.get_size()
-	view_cone.scale = Vector2(tan(fov) * far_plane / (cone_size.x / 2), far_plane / cone_size.y)
+	view_cone.scale = Vector2(tan(fov) * far_plane / (cone_size.x / 2), far_plane / cone_size.y) * Constants.TILEMAP_CELL_SIZE
 	
 
 func _draw():
@@ -44,3 +44,7 @@ func _physics_process(delta : float):
 		return
 		
 	emit_signal("physics_changed")
+
+
+func get_origin() -> Vector2:
+	return position / Constants.TILEMAP_CELL_SIZE
