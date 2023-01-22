@@ -4,8 +4,7 @@
 [ext_resource type="Shader" path="res://canvas.gdshader" id="1_72wgp"]
 
 [sub_resource type="Gradient" id="Gradient_bcsj4"]
-interpolation_mode = 2
-offsets = PackedFloat32Array(0.44591, 0.905013)
+offsets = PackedFloat32Array(0.675462, 0.905013)
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_spxq0"]
 gradient = SubResource("Gradient_bcsj4")
@@ -15,6 +14,7 @@ shader = ExtResource("1_72wgp")
 shader_parameter/view_pos = null
 shader_parameter/depth_scale = 0.02
 shader_parameter/far_plane = null
+shader_parameter/fog_colour = Color(1, 1, 1, 1)
 shader_parameter/ceiling_colour = Color(1, 1, 1, 1)
 shader_parameter/floor_colour = null
 shader_parameter/light_colour = Color(0.6, 0.6, 0.6, 1)

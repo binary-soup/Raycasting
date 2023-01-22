@@ -7,6 +7,7 @@ uniform float depth_scale = 0.1;
 
 uniform float far_plane;
 uniform sampler2D fog_gradient;
+uniform vec4 fog_colour : source_color;
 
 uniform vec4 ceiling_colour : source_color;
 uniform vec4 floor_colour : source_color;
@@ -38,15 +39,19 @@ vec2 apply_parallax(vec2 uv, vec3 view_dir) {
 }
 
 vec3 sample_normal_vector(vec2 uv) {
-    return 2.0 * texture(normal_map, uv).rgb - 1.0;
+	return 2.0 * texture(normal_map, uv).rgb - 1.0;
 }
 
-vec4 draw_ceiling() {
-	return ceiling_colour;
+vec4 sample_fog(float dist) {
+	return fog_colour * texture(fog_gradient, vec2(dist / far_plane, 0.0));
 }
 
-vec4 draw_floor() {
-	return floor_colour;
+vec4 draw_ceiling(vec2 uv) {
+	return ceiling_colour + sample_fog(0.5 / (0.5 - uv.y));
+}
+
+vec4 draw_floor(vec2 uv) {
+	return floor_colour + sample_fog(0.5 / (uv.y - 0.5));
 }
 
 vec4 draw_wall(Wall wall) {
@@ -66,13 +71,11 @@ vec4 draw_wall(Wall wall) {
 		normal = sample_normal_vector(uv);
 	}
 	else {
-		normal = vec3(0.0, 0.0, 1.0) * tbn;
+		normal = vec3(0.0, 0.0, -1.0) * tbn;
 	}
 	
 	colour *= light_colour * max(dot(light_dir, normal), 0);
-
-	colour.a = 1.0;
-	return colour;
+	return colour + sample_fog(wall.dist);
 }
 
 vec4 calc_colour(vec2 uv) {
@@ -85,22 +88,22 @@ vec4 calc_colour(vec2 uv) {
 	float v = wall.dist * uv.y - wall.dist * 0.5 + 0.5;
 	
 	if (v < 0.0) {
-		return draw_ceiling();
+		return draw_ceiling(uv);
 	}
 	
 	if (v > 1.0) {
-		return draw_floor();
+		return draw_floor(uv);
 	}
 	
 	if (wall.dist >= far_plane) {
-		return vec4(1.0);
+		return fog_colour;
 	}
 	
 	wall.uv = vec2(data.b, v);
 	wall.position = texture(data_texture, vec2(uv.x, 0.5)).rg;
 	wall.normal = texture(data_texture, vec2(uv.x, 1.0)).rgb;
 	
-	return draw_wall(wall) + texture(fog_gradient, vec2(wall.dist / far_plane, 0.0));
+	return draw_wall(wall);
 }
 
 void fragment() {
