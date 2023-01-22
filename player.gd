@@ -1,6 +1,8 @@
 extends CharacterBody2D
 class_name Player
 
+signal physics_changed
+
 @onready var hit_box := $CollisionShape2D
 @onready var view_cone := $ViewCone
 
@@ -9,25 +11,26 @@ class_name Player
 @export var fov := PI/4
 @export var far_plane := 300.0
 
-const view_cone_image_size := Vector2(768, 512) 
-
 
 func _ready():
-	view_cone.scale = Vector2(tan(fov) * far_plane / (view_cone_image_size.x / 2), far_plane / view_cone_image_size.y)
+	var cone_size : Vector2 = view_cone.texture.get_size()
+	view_cone.scale = Vector2(tan(fov) * far_plane / (cone_size.x / 2), far_plane / cone_size.y)
 	
 
 func _draw():
 	draw_circle(Vector2(), hit_box.shape.radius, Color.BLACK)
 
 
-func _process(delta : float):
+func _physics_process(delta : float):
 	velocity = Vector2()
+	var rotate_amount := 0.0
 	
 	if Input.is_action_pressed("rotate_left"):
-		rotation -= rotate_speed * delta
+		rotate_amount = -rotate_speed * delta
 	elif Input.is_action_pressed("rotate_right"):
-		rotation += rotate_speed * delta
+		rotate_amount = rotate_speed * delta
 	
+	rotation += rotate_amount
 	var dir := Vector2.UP.rotated(rotation)
 	
 	if Input.is_action_pressed("move_forward"):
@@ -36,3 +39,8 @@ func _process(delta : float):
 		velocity = dir * -move_speed
 
 	move_and_slide()
+	
+	if velocity == Vector2() and rotate_amount == 0.0:
+		return
+		
+	emit_signal("physics_changed")

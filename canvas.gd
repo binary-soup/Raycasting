@@ -22,14 +22,9 @@ func _ready():
 	_init_shader_parameters()
 	_init_compute()
 	_on_resized()
-
-
-func _process(_delta : float):
-	# rebuild data uniforms that change every frame
-	_build_camera_data_uniform()
-	material.set_shader_parameter("view_pos", player.position)
 	
-	_render_frame()
+	player.connect("physics_changed", _calculate_frame)
+	_calculate_frame()
 
 
 func _init_shader_parameters():
@@ -62,10 +57,12 @@ func _on_resized():
 	var image := Image.create(canvas_size.x, canvas_size.y, false, Image.FORMAT_RGBAF)
 	texture = ImageTexture.create_from_image(image)
 	
+	_build_params_uniform()
+	
 	output_data_size = Vector2i(canvas_size.x, 3)
 	_build_output_data_texture_uniform()
 	
-	_build_params_uniform()
+	_calculate_frame()
 
 
 func _build_output_data_texture_uniform():
@@ -136,7 +133,11 @@ func _tile_to_byte_array(tile : Maze.Tile) -> PackedByteArray:
 	return PackedInt32Array([tile.texture_index]).to_byte_array()
 
 
-func _render_frame():	
+func _calculate_frame():
+	# rebuild data uniforms that change every frame
+	_build_camera_data_uniform()
+	material.set_shader_parameter("view_pos", player.position)
+	
 	# start recording compute commands
 	var compute_list := rd.compute_list_begin()
 	
