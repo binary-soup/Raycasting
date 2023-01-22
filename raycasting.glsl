@@ -3,8 +3,7 @@
 
 layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
 
-layout(rgba32f, binding = 0) uniform image2D canvas;
-layout(rgba32f, binding = 6) uniform image2D output_data;
+layout(rgba32f, binding = 0) uniform image2D output_data;
 
 layout(set = 0, binding = 1, std430) restrict buffer CameraData {
     vec2 origin;
@@ -15,7 +14,7 @@ layout(set = 0, binding = 1, std430) restrict buffer CameraData {
 camera_data;
 
 struct Tile {
-    ivec2 atlas_coords;
+    int texture_index;
 };
 
 struct Rect2i {
@@ -24,36 +23,16 @@ struct Rect2i {
 };
 
 layout(set = 0, binding = 2, std430) restrict buffer Tilemap {
-    vec4 ceil_colour;
-    vec4 floor_colour;
-
     Rect2i dim;
-    ivec2 atlas_dim;
-
-    int cell_size;
-    int pad;
-
     Tile[] tiles;
 }
 tilemap;
 
-layout(set = 0, binding = 3) uniform sampler2D tilemap_atlas;
-
-layout(set = 0, binding = 4) uniform sampler2D tilemap_normal_map;
-
-struct PointLight {
-    vec4 colour;
-    vec2 position;
-    float z_offset;
-    float pad;
-};
-
-layout(set = 0, binding = 5, std430) restrict buffer LightData {
-    vec4 ambient;
-    vec3 att;
-    int num_lights;
-    PointLight[] lights;
-} light_data;
+layout(set = 0, binding = 3, std430) restrict buffer Params {
+    ivec2 canvas_size;
+    int cell_size;
+}
+params;
 
 struct Ray {
     vec2 pos;
@@ -65,7 +44,7 @@ struct RayHit {
     float dist;
     float u;
     vec3 normal;
-    ivec2 atlas_coords;
+    int texture_index;
 };
 
 struct Rect2 {
@@ -78,13 +57,10 @@ const vec3 UP = vec3(0.0, -1.0, 0.0);
 const vec3 DOWN = vec3(0.0, 1.0, 0.0);
 const vec3 LEFT = vec3(-1.0, 0.0, 0.0);
 const vec3 RIGHT = vec3(1.0, 0.0, 0.0);
-const vec3 TANGENT = vec3(0.0, 0.0, 1.0);
 
 //============================
 
-ivec2 canvas_size;
 int max_wall_height;
-
 int tilemap_num_cols;
 int tilemap_index_offset;
 
@@ -96,10 +72,6 @@ mat2 rotation(float a) {
 
 float lerp(float from, float to, float weight) {
     return from + (to - from) * weight;
-}
-
-vec2 lerp_vec2(vec2 from, vec2 to, vec2 weight) {
-    return vec2(lerp(from.x, to.x, weight.x), lerp(from.y, to.y, weight.y));
 }
 
 vec2 floor_vec(vec2 v) {
@@ -130,7 +102,7 @@ vec2 intersect_vertical_line(float x, float slope, vec2 pos) {
 }
 
 RayHit calc_intersection(Ray ray) {
-    Rect2 cell = new_rect(floor_vec(ray.pos / tilemap.cell_size) * tilemap.cell_size - STEP_OFFSET, vec2(tilemap.cell_size) + STEP_OFFSET);
+    Rect2 cell = new_rect(floor_vec(ray.pos / params.cell_size) * params.cell_size - STEP_OFFSET, vec2(params.cell_size) + STEP_OFFSET);
     RayHit hit;
 
     if (ray.dir.y == -1.0) {
@@ -189,8 +161,8 @@ RayHit calc_intersection(Ray ray) {
 }
 
 Tile get_tile(vec2 point) {
-    int x = clamp(int(floor(point.x / tilemap.cell_size)), tilemap.dim.start.x, tilemap.dim.end.x);
-    int y = clamp(int(floor(point.y / tilemap.cell_size)), tilemap.dim.start.y, tilemap.dim.end.y);
+    int x = clamp(int(floor(point.x / params.cell_size)), tilemap.dim.start.x, tilemap.dim.end.x);
+    int y = clamp(int(floor(point.y / params.cell_size)), tilemap.dim.start.y, tilemap.dim.end.y);
 
     int index = y * tilemap_num_cols + x;
     return tilemap.tiles[index - tilemap_index_offset];
@@ -212,8 +184,8 @@ RayHit raycast(float angle) {
             return hit;
         }
 
-        hit.atlas_coords = get_tile(hit.point).atlas_coords;
-        if (hit.atlas_coords.x >= 0 && hit.atlas_coords.y >= 0) {
+        hit.texture_index = get_tile(hit.point).texture_index;
+        if (hit.texture_index >= 0) {
             return hit;
         }
 
@@ -221,73 +193,18 @@ RayHit raycast(float angle) {
     }
 }
 
-void draw_coloured_line(int start, int end, vec4 colour) {
-    for (int y = start; y < end; y++) {
-        imageStore(canvas, ivec2(gl_GlobalInvocationID.x, y), colour);
-    }
-}
-
-vec3 sample_normal_vector(vec3 normal, vec2 uv) {
-    vec3 b = cross(normal, TANGENT);
-    mat3 tbn = mat3(TANGENT.x, TANGENT.y, TANGENT.z, b.x, b.y, b.z, normal.x, normal.y, normal.z);
-
-    return tbn * (2 * texture(tilemap_normal_map, uv).xyz - 1.0);
-}
-
-vec4 calc_light_colour(RayHit ray, vec2 uv, float v) {
-    vec4 colour = light_data.ambient;
-
-    for (int i = 0; i < light_data.num_lights; i++) {
-        PointLight light = light_data.lights[i];
-
-        vec3 light_pos = vec3(light.position.x, light.position.y, (1.0 - light.z_offset) * tilemap.cell_size);
-        vec3 point = vec3(ray.point.x, ray.point.y, (1.0 - v) * tilemap.cell_size);
-
-        vec3 light_vec = light_pos - point;
-        float len = length(light_vec);
-
-        colour += max(dot(light_vec / len, sample_normal_vector(ray.normal, uv)), 0) * light.colour / dot(light_data.att, vec3(1.0, len, len * len));
-    }
-
-    return colour;
-}
-
-void draw_textured_line(int start, int end, RayHit ray) {
-    vec2 offset = 1.0 / tilemap.atlas_dim;
-
-    for (int y = start; y < end; y++) {
-        float v = lerp(0.0, 1.0, float(y - start) / (end - start));
-
-        vec2 uv = lerp_vec2(offset * ray.atlas_coords, offset * (ray.atlas_coords + ivec2(1)), vec2(ray.u, v));
-        vec4 light_colour = calc_light_colour(ray, uv, v);
-
-        imageStore(canvas, ivec2(gl_GlobalInvocationID.x, y), texture(tilemap_atlas, uv) * light_colour);
-    }
-}
-
-void draw_wall(RayHit ray) {
-    int mid_point = canvas_size.y / 2;
-    int height = int(floor(max_wall_height / ray.dist));
-
-    draw_coloured_line(0, mid_point - height, tilemap.ceil_colour);
-    draw_textured_line(mid_point - height, mid_point + height, ray);
-    draw_coloured_line(mid_point + height, canvas_size.y, tilemap.floor_colour);
-}
-
 void main() {
-    canvas_size = imageSize(canvas);
-    max_wall_height = canvas_size.y / 2 * tilemap.cell_size;
+    max_wall_height = params.canvas_size.y / 2 * params.cell_size;
 
     tilemap_num_cols = tilemap.dim.end.x - tilemap.dim.start.x;
     tilemap_index_offset = tilemap.dim.start.y * tilemap_num_cols + tilemap.dim.start.x;
 
-    float x = lerp(tan(camera_data.fov), tan(-camera_data.fov), float(gl_GlobalInvocationID.x) / canvas_size.x);
+    float x = lerp(tan(camera_data.fov), tan(-camera_data.fov), float(gl_GlobalInvocationID.x) / params.canvas_size.x);
     RayHit ray = raycast(atan(x));
 
-    //draw_wall(ray);
+    float wall_offset = 1 - floor(max_wall_height / ray.dist) / params.canvas_size.y * 2;
 
-    float wall_offset = 1 - floor(max_wall_height / ray.dist) / canvas_size.y * 2;
-    imageStore(output_data, ivec2(gl_GlobalInvocationID.x, 0), vec4(wall_offset, ray.u, ray.atlas_coords));
+    imageStore(output_data, ivec2(gl_GlobalInvocationID.x, 0), vec4(wall_offset, ray.u, ray.texture_index, 0.0));
     imageStore(output_data, ivec2(gl_GlobalInvocationID.x, 1), vec4(ray.point, 0.0, 0.0));
     imageStore(output_data, ivec2(gl_GlobalInvocationID.x, 2), vec4(ray.normal, 0.0));
 }

@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://main.gd" id="1_7qaav"]
 [ext_resource type="PackedScene" uid="uid://5005s1jul1gw" path="res://canvas.tscn" id="2_koy5b"]
 [ext_resource type="PackedScene" uid="uid://cvq8bpxksvjic" path="res://player.tscn" id="2_sdc5p"]
-[ext_resource type="PackedScene" uid="uid://4ntowut6oijq" path="res://maze.tscn" id="4_bd2vm"]
+[ext_resource type="PackedScene" uid="uid://co5hhkcwleao7" path="res://maze.tscn" id="4_bd2vm"]
 [ext_resource type="Script" path="res://FPSLabel.gd" id="7_erhbp"]
 
 [node name="Main" type="Control"]

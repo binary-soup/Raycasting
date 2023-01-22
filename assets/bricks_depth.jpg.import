@@ -2,9 +2,9 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bmxsti47n15w"
-path.s3tc="res://.godot/imported/uv_grid_p.png-23fe932f8b962399e7ef21514aa4ee94.s3tc.ctex"
-path.etc2="res://.godot/imported/uv_grid_p.png-23fe932f8b962399e7ef21514aa4ee94.etc2.ctex"
+uid="uid://bnj7k1wwfgn0j"
+path.s3tc="res://.godot/imported/bricks_depth.jpg-574a3e8f0c2c9dd56980aa573bff19e2.s3tc.ctex"
+path.etc2="res://.godot/imported/bricks_depth.jpg-574a3e8f0c2c9dd56980aa573bff19e2.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc", "etc2"],
 "vram_texture": true
@@ -12,8 +12,8 @@ metadata={
 
 [deps]
 
-source_file="res://assets/uv_grid_p.png"
-dest_files=["res://.godot/imported/uv_grid_p.png-23fe932f8b962399e7ef21514aa4ee94.s3tc.ctex", "res://.godot/imported/uv_grid_p.png-23fe932f8b962399e7ef21514aa4ee94.etc2.ctex"]
+source_file="res://assets/bricks_depth.jpg"
+dest_files=["res://.godot/imported/bricks_depth.jpg-574a3e8f0c2c9dd56980aa573bff19e2.s3tc.ctex", "res://.godot/imported/bricks_depth.jpg-574a3e8f0c2c9dd56980aa573bff19e2.etc2.ctex"]
 
 [params]
 

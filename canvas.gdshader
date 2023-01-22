@@ -8,11 +8,9 @@ uniform float depth_scale = 0.1;
 uniform vec4 ceiling_colour : source_color;
 uniform vec4 floor_colour : source_color;
 
-uniform ivec2 atlas_dimensions;
 uniform sampler2DArray diffuse_textures;
-
-uniform sampler2D tilemap_normal_map;
-uniform sampler2D tilemap_parallax_map;
+uniform sampler2D normal_map;
+uniform sampler2D depth_map;
 
 uniform vec4 light_colour : source_color = vec4(vec3(0.6), 1.0);
 
@@ -24,13 +22,12 @@ const vec3 BITANGENT = vec3(0.0, 0.0, -1.0);
 //===================
 
 vec2 apply_parallax(vec2 uv, vec3 view_dir) {
-	float depth = texture(tilemap_parallax_map, uv).r;
-	vec2 p = view_dir.xy / view_dir.z * depth * depth_scale;
-	return uv + p;
+	float depth = texture(depth_map, uv).r;
+	return uv + view_dir.xy / view_dir.z * depth * depth_scale;
 }
 
 vec3 sample_normal_vector(vec2 uv) {
-    return 2.0 * texture(tilemap_normal_map, uv).rgb - 1.0;
+    return 2.0 * texture(normal_map, uv).rgb - 1.0;
 }
 
 vec4 draw_ceiling() {
@@ -41,7 +38,7 @@ vec4 draw_floor() {
 	return floor_colour;
 }
 
-vec4 draw_wall(vec2 uv, vec2 atlas_coords, vec2 position, vec3 normal) {
+vec4 draw_wall(vec2 uv, float texture_index, vec2 position, vec3 normal) {
 	mat3 tbn = mat3(cross(normal, BITANGENT), BITANGENT, normal);
 	
 	if (use_parallax_mapping) {
@@ -49,7 +46,7 @@ vec4 draw_wall(vec2 uv, vec2 atlas_coords, vec2 position, vec3 normal) {
 		uv = apply_parallax(uv, view_dir);
 	}
 	
-	vec4 colour = texture(diffuse_textures, vec3(uv, atlas_coords.y * float(atlas_dimensions.y) + atlas_coords.x));
+	vec4 colour = texture(diffuse_textures, vec3(uv, texture_index));
 	vec3 light_dir = normalize(vec3(normal.xy, 1.0)) * tbn;
 	
 	if (use_normal_mapping) {
@@ -91,7 +88,7 @@ vec4 calc_colour(vec2 uv) {
 	vec2 position = texture(data_texture, vec2(uv.x, 0.5)).rg;
 	vec3 normal = texture(data_texture, vec2(uv.x, 1.0)).rgb;
 	
-	return draw_wall(vec2(data.g, v), data.ba, position, normal);
+	return draw_wall(vec2(data.g, v), data.b, position, normal);
 }
 
 void fragment() {

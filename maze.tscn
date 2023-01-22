@@ -1,10 +1,10 @@
-[gd_scene load_steps=12 format=3 uid="uid://4ntowut6oijq"]
+[gd_scene load_steps=12 format=3 uid="uid://co5hhkcwleao7"]
 
 [ext_resource type="Texture2D" uid="uid://b1fmx6nrf031c" path="res://assets/tilemap.png" id="1_outtt"]
 [ext_resource type="Script" path="res://maze.gd" id="2_4gupg"]
-[ext_resource type="Texture2D" uid="uid://uma54tgpjm26" path="res://assets/uv_grid.png" id="3_ar8jn"]
-[ext_resource type="PackedScene" uid="uid://b2qy6f27ei7qo" path="res://maze_light.tscn" id="4_olid6"]
-[ext_resource type="Texture2D" uid="uid://d0ofrf2wod0up" path="res://assets/uv_grid_n.png" id="4_qg406"]
+[ext_resource type="CompressedTexture2DArray" uid="uid://biipvm3s2xoam" path="res://assets/bricks_coloured.jpg" id="3_f02c8"]
+[ext_resource type="Texture2D" uid="uid://uyrr7hw16445" path="res://assets/bricks_normal.jpg" id="3_nhbe8"]
+[ext_resource type="Texture2D" uid="uid://bnj7k1wwfgn0j" path="res://assets/bricks_depth.jpg" id="4_dmrxb"]
 
 [sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_qj8rq"]
 polygon = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
@@ -53,33 +53,6 @@ layer_0/tile_data = PackedInt32Array(-327686, 2, 0, -262150, 2, 0, -196614, 2, 0
 script = ExtResource("2_4gupg")
 ceiling_colour = Color(0.278431, 0.494118, 0.498039, 1)
 floor_colour = Color(0.658824, 0.505882, 0.305882, 1)
-tilemap_atlas = ExtResource("3_ar8jn")
-tilemap_normal_map = ExtResource("4_qg406")
-ambient_colour = Color(0.196078, 0.196078, 0.196078, 1)
-light_att = Vector3(0, 0.1, 0)
-
-[node name="Lights" type="Node2D" parent="."]
-
-[node name="MazeLight" parent="Lights" instance=ExtResource("4_olid6")]
-position = Vector2(-72, -72)
-
-[node name="MazeLight2" parent="Lights" instance=ExtResource("4_olid6")]
-position = Vector2(72, -72)
-
-[node name="MazeLight3" parent="Lights" instance=ExtResource("4_olid6")]
-position = Vector2(72, 72)
-
-[node name="MazeLight4" parent="Lights" instance=ExtResource("4_olid6")]
-position = Vector2(-72, 72)
-
-[node name="MazeLight5" parent="Lights" instance=ExtResource("4_olid6")]
-position = Vector2(-64, 0)
-
-[node name="MazeLight6" parent="Lights" instance=ExtResource("4_olid6")]
-position = Vector2(0, -64)
-
-[node name="MazeLight7" parent="Lights" instance=ExtResource("4_olid6")]
-position = Vector2(64, 0)
-
-[node name="MazeLight8" parent="Lights" instance=ExtResource("4_olid6")]
-position = Vector2(0, 64)
+diffuse_textures = ExtResource("3_f02c8")
+normal_map = ExtResource("3_nhbe8")
+depth_map = ExtResource("4_dmrxb")

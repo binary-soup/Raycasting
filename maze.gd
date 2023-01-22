@@ -1,32 +1,28 @@
 extends TileMap
 class_name Maze
 
-@onready var lights_node := $Lights
-
 @export var ceiling_colour := Color.CADET_BLUE
 @export var floor_colour := Color.BURLYWOOD
-@export var tilemap_atlas : Texture2D
-@export var tilemap_normal_map : Texture2D
-@export var ambient_colour : Color
-@export var light_att : Vector3
+@export var diffuse_textures : CompressedTexture2DArray
+@export var normal_map : Texture2D
+@export var depth_map : Texture2D
 
-const atlas_dim := Vector2i(2, 2)
-const cell_size := 16
+const num_altas_rows := 2
 
 class Tile extends Resource:
-	var atlas_coords : Vector2i
+	var texture_index : int
 	
 	func _init(coords : Vector2i):
-		atlas_coords = coords
+		texture_index = coords.y * num_altas_rows + coords.x
 
 
 func _draw():
 	var bounds := get_used_rect()
 	
-	var top_left := bounds.position * cell_size
-	var top_right := Vector2(bounds.end.x, bounds.position.y) * cell_size
-	var bottom_left := Vector2(bounds.position.x, bounds.end.y) * cell_size
-	var bottom_right := bounds.end * cell_size
+	var top_left := bounds.position * cell_quadrant_size
+	var top_right := Vector2(bounds.end.x, bounds.position.y) * cell_quadrant_size
+	var bottom_left := Vector2(bounds.position.x, bounds.end.y) * cell_quadrant_size
+	var bottom_right := bounds.end * cell_quadrant_size
 	
 	draw_colored_polygon([top_left, top_right, bottom_right, bottom_left], floor_colour)
 
@@ -40,14 +36,6 @@ func get_tiles() -> Array[Tile]:
 			tiles.append(_new_tile(Vector2i(x, y)))
 	
 	return tiles
-
-
-func get_light_count() -> int:
-	return lights_node.get_child_count()
-
-
-func get_lights() -> Array:
-	return lights_node.get_children()
 
 
 func _new_tile(pos : Vector2i) -> Tile:
