@@ -9,13 +9,13 @@ signal physics_changed
 @export var move_speed := 50
 @export var rotate_speed := PI/3
 @export var fov := PI/4
-@export var far_plane := 10.0
 
+@export var far_plane := 20.0 :
+	set(val):
+		far_plane = val
+		var cone_size : Vector2 = view_cone.texture.get_size()
+		view_cone.scale = Vector2(tan(fov) * val / (cone_size.x / 2), val / cone_size.y) * Constants.TILEMAP_CELL_SIZE
 
-func _ready():
-	var cone_size : Vector2 = view_cone.texture.get_size()
-	view_cone.scale = Vector2(tan(fov) * far_plane / (cone_size.x / 2), far_plane / cone_size.y) * Constants.TILEMAP_CELL_SIZE
-	
 
 func _draw():
 	draw_circle(Vector2(), hit_box.shape.radius, Color.BLACK)

@@ -35,7 +35,6 @@ render_target_update_mode = 4
 [node name="Player" parent="SubViewportContainer/MiniMap" instance=ExtResource("2_sdc5p")]
 
 [node name="Camera" type="Camera2D" parent="SubViewportContainer/MiniMap/Player"]
-current = true
 
 [node name="Canvas" parent="." instance=ExtResource("2_koy5b")]
 layout_mode = 1

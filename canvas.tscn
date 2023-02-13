@@ -40,7 +40,7 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = -216.0
-offset_top = -122.0
+offset_top = -175.0
 offset_right = -14.0
 offset_bottom = -17.0
 grow_horizontal = 0
@@ -70,6 +70,18 @@ layout_mode = 2
 button_pressed = true
 text = "Parallax Mapping"
 
+[node name="Label" type="Label" parent="ColorRect/CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "Far Plane:"
+
+[node name="FarPlane" type="HSlider" parent="ColorRect/CenterContainer/VBoxContainer"]
+layout_mode = 2
+min_value = 3.0
+max_value = 20.0
+value = 3.0
+scrollable = false
+
 [connection signal="resized" from="." to="." method="_on_resized"]
 [connection signal="toggled" from="ColorRect/CenterContainer/VBoxContainer/NormalMapping" to="." method="_on_normal_mapping_toggled"]
 [connection signal="toggled" from="ColorRect/CenterContainer/VBoxContainer/ParallaxMapping" to="." method="_on_parallax_mapping_toggled"]
+[connection signal="value_changed" from="ColorRect/CenterContainer/VBoxContainer/FarPlane" to="." method="_on_far_plane_value_changed"]

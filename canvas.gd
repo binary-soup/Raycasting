@@ -1,10 +1,10 @@
 extends TextureRect
 class_name Canvas
 
-@export_node_path(Player) var player_path
+@export_node_path("Player") var player_path
 @onready var player : Player = get_node(player_path)
 
-@export_node_path(Maze) var maze_path
+@export_node_path("Maze") var maze_path
 @onready var maze : Maze = get_node(maze_path)
 
 var rd : RenderingDevice
@@ -30,7 +30,8 @@ func _ready():
 func _init_shader_parameters():
 	material.set_shader_parameter("ceiling_colour", maze.ceiling_colour)
 	material.set_shader_parameter("floor_colour", maze.floor_colour)
-	material.set_shader_parameter("far_plane", player.far_plane)
+	
+	$ColorRect/CenterContainer/VBoxContainer/FarPlane.value = player.far_plane
 	
 	material.set_shader_parameter("diffuse_textures", maze.diffuse_textures)
 	material.set_shader_parameter("normal_map", maze.normal_map)
@@ -142,7 +143,7 @@ func _calculate_frame():
 	rd.compute_list_bind_uniform_set(compute_list, uniform_set, 0)
 	
 	# dispatch work groups so there are enough threads for every column
-	@warning_ignore(integer_division)
+	@warning_ignore("integer_division")
 	rd.compute_list_dispatch(compute_list, canvas_size.x / 64, 1, 1)
 	
 	# end compute commands
@@ -165,3 +166,8 @@ func _on_normal_mapping_toggled(button_pressed : bool):
 
 func _on_parallax_mapping_toggled(button_pressed : bool):
 	material.set_shader_parameter("use_parallax_mapping", button_pressed)
+
+
+func _on_far_plane_value_changed(value : float):
+	player.far_plane = value
+	material.set_shader_parameter("far_plane", value)
