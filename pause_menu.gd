@@ -7,7 +7,12 @@ class_name PauseMenu
 	set(val):
 		paused = val
 		visible = val
-		get_tree().paused = paused
+		get_tree().paused = val
+		
+		if val:
+			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+		else:
+			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 
 func _ready():
@@ -17,3 +22,11 @@ func _ready():
 func _unhandled_input(_event):
 	if Input.is_action_just_pressed("pause"):
 		paused = !paused
+
+
+func _on_resume_button_pressed():
+	paused = false
+
+
+func _on_quit_button_pressed():
+	get_tree().quit()
