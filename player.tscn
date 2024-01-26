@@ -7,6 +7,7 @@
 radius = 5.0
 
 [node name="Player" type="CharacterBody2D"]
+motion_mode = 1
 script = ExtResource("1_xcrt6")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
