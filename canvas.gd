@@ -129,6 +129,7 @@ func _calculate_frame():
 	# rebuild data uniforms that change every frame
 	_build_camera_data_uniform()
 	material.set_shader_parameter("view_pos", player.get_origin())
+	material.set_shader_parameter("pitch", player.pitch)
 	
 	# start recording compute commands
 	var compute_list := rd.compute_list_begin()

@@ -3,6 +3,7 @@ shader_type canvas_item;
 uniform sampler2D data_texture : filter_nearest;
 
 uniform vec2 view_pos;
+uniform float pitch;
 uniform float depth_scale = 0.1;
 
 uniform float far_plane;
@@ -85,7 +86,8 @@ vec4 calc_colour(vec2 uv) {
 	wall.dist = data.r;
 	wall.texture_index = data.g;
 	
-	float v = wall.dist * uv.y - wall.dist * 0.5 + 0.5;
+	float height_offset = 0.5 + wall.dist * tan(pitch);
+	float v = wall.dist * uv.y - wall.dist * 0.5 + height_offset;
 	
 	if (v < 0.0) {
 		return draw_ceiling(uv);
