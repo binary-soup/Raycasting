@@ -8,6 +8,7 @@ signal physics_changed
 
 @export var acceleration := 5.0
 @export var walk_speed := 30.0
+@export var strafe_speed := 20.0
 @export var sprint_speed := 50.0
 
 @export var mouse_sensitivity := 0.215
@@ -60,7 +61,7 @@ func _target_velocity() -> Vector2:
 		target.x -= 1
 	if Input.is_action_pressed("move_right"):
 		target.x += 1
-	target.x *= walk_speed
+	target.x *= strafe_speed
 	
 	return target.rotated(rotation)
 
