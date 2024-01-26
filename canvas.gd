@@ -30,9 +30,7 @@ func _ready():
 func _init_shader_parameters():
 	material.set_shader_parameter("ceiling_colour", maze.ceiling_colour)
 	material.set_shader_parameter("floor_colour", maze.floor_colour)
-	
-	$ColorRect/CenterContainer/VBoxContainer/FarPlane.value = player.far_plane
-	
+	material.set_shader_parameter("far_plane", player.far_plane)
 	material.set_shader_parameter("diffuse_textures", maze.diffuse_textures)
 	material.set_shader_parameter("normal_map", maze.normal_map)
 	material.set_shader_parameter("depth_map", maze.depth_map)
@@ -160,14 +158,17 @@ func _calculate_frame():
 	data_texture.update(Image.create_from_data(output_data_size.x, output_data_size.y, false, Image.FORMAT_RGBAF, data))
 
 
-func _on_normal_mapping_toggled(button_pressed : bool):
-	material.set_shader_parameter("use_normal_mapping", button_pressed)
+# DebugOptions group
+func _on_normal_mapping_toggled(val : bool):
+	material.set_shader_parameter("use_normal_mapping", val)
 
 
-func _on_parallax_mapping_toggled(button_pressed : bool):
-	material.set_shader_parameter("use_parallax_mapping", button_pressed)
+# DebugOptions group
+func _on_parallax_mapping_toggled(val : bool):
+	material.set_shader_parameter("use_parallax_mapping", val)
 
 
-func _on_far_plane_value_changed(value : float):
-	player.far_plane = value
-	material.set_shader_parameter("far_plane", value)
+# DebugOptions group
+func _on_far_plane_value_changed(val : float):
+	player.far_plane = val
+	material.set_shader_parameter("far_plane", val)

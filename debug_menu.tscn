@@ -1,0 +1,50 @@
+[gd_scene load_steps=2 format=3 uid="uid://c2d503e8elyoh"]
+
+[ext_resource type="Script" path="res://debug_menu.gd" id="1_0krw3"]
+
+[node name="DebugMenu" type="ColorRect"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.588235)
+script = ExtResource("1_0krw3")
+metadata/_edit_group_ = true
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="NormalMapping" type="CheckBox" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+button_pressed = true
+text = "Normal Mapping"
+
+[node name="ParallaxMapping" type="CheckBox" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+button_pressed = true
+text = "Parallax Mapping"
+
+[node name="Label" type="Label" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "Far Plane:"
+
+[node name="FarPlane" type="HSlider" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+min_value = 3.0
+max_value = 20.0
+value = 20.0
+scrollable = false
+
+[connection signal="toggled" from="CenterContainer/VBoxContainer/NormalMapping" to="." method="_on_normal_mapping_toggled"]
+[connection signal="toggled" from="CenterContainer/VBoxContainer/ParallaxMapping" to="." method="_on_parallax_mapping_toggled"]
+[connection signal="value_changed" from="CenterContainer/VBoxContainer/FarPlane" to="." method="_on_far_plane_value_changed"]
