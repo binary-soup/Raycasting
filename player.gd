@@ -6,6 +6,7 @@ signal physics_changed
 @onready var hit_box := $CollisionShape2D
 @onready var view_cone := $ViewCone
 
+@export var acceleration := 5.0
 @export var walk_speed := 30.0
 @export var sprint_speed := 50.0
 
@@ -25,30 +26,47 @@ func _draw():
 
 
 func _physics_process(delta : float):
-	velocity = Vector2()
 	var rotate_amount := Main.MOUSE_MOTION * mouse_sensitivity
-	
 	rotation += rotate_amount.x * delta
-	var up := Vector2.UP.rotated(rotation)
-	var left := Vector2.LEFT.rotated(rotation)
 	
-	if Input.is_action_pressed("move_forward"):
-		velocity = up * _choose_speed()
-	elif Input.is_action_pressed("move_back"):
-		velocity = -up * walk_speed
-	elif Input.is_action_pressed("move_left"):
-		velocity = left * walk_speed
-	elif Input.is_action_pressed("move_right"):
-		velocity = -left * walk_speed
-
-	move_and_slide()
+	_handle_movement()
 	
 	if velocity != Vector2() or rotate_amount.x != 0.0:
 		emit_signal("physics_changed")
 
 
+func _handle_movement():
+	var target := _target_velocity()
+	var diff := target - velocity
+	
+	if acceleration >= diff.length():
+		velocity = target
+	else:
+		velocity += diff.normalized() * acceleration
+
+	move_and_slide()
+
+
+func _target_velocity() -> Vector2:
+	var target := Vector2()
+	
+	if Input.is_action_pressed("move_forward"):
+		target.y -= 1
+	if Input.is_action_pressed("move_back"):
+		target.y += 1
+	target.y *= _choose_speed()
+		
+	if Input.is_action_pressed("move_left"):
+		target.x -= 1
+	if Input.is_action_pressed("move_right"):
+		target.x += 1
+	target.x *= walk_speed
+	
+	return target.rotated(rotation)
+
+
 func _choose_speed() -> float:
-	if Input.is_action_pressed("sprint"):
+	if Input.is_action_pressed("move_forward") and Input.is_action_pressed("sprint"):
 		return sprint_speed
 	else:
 		return walk_speed
