@@ -4,7 +4,7 @@ class_name Main
 static var MOUSE_MOTION : Vector2
 
 
-func _process(delta):
+func _process(_delta):
 	MOUSE_MOTION = Vector2()
 
 
