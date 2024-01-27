@@ -31,7 +31,7 @@ func _draw():
 func _physics_process(delta : float):
 	var rotate_amount := Main.MOUSE_MOTION * mouse_sensitivity
 	rotation += rotate_amount.x * delta
-	pitch = clamp(pitch + rotate_amount.y * delta, -PI/2, PI/2)
+	pitch = clamp(pitch + rotate_amount.y * delta, -PI/4, PI/4)
 	
 	_handle_movement()
 	
