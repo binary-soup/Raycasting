@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://bwhs7whvcqaov" path="res://assets/view_cone.png" id="2_pqh0w"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_bgty5"]
-radius = 5.0
+radius = 7.5
 
 [node name="Player" type="CharacterBody2D"]
 motion_mode = 1

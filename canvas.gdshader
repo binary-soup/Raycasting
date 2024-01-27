@@ -84,10 +84,8 @@ vec4 calc_colour(vec2 uv) {
 	
 	Wall wall;
 	wall.dist = data.r;
-	wall.texture_index = data.g;
 	
-	float height_offset = 0.5 + wall.dist * tan(pitch);
-	float v = wall.dist * uv.y - wall.dist * 0.5 + height_offset;
+	float v = wall.dist * uv.y - wall.dist * 0.5 + 0.5 + data.g;
 	
 	if (v < 0.0) {
 		return draw_ceiling(uv);
@@ -101,7 +99,8 @@ vec4 calc_colour(vec2 uv) {
 		return fog_colour;
 	}
 	
-	wall.uv = vec2(data.b, v);
+	wall.texture_index = data.b;
+	wall.uv = vec2(data.a, v);
 	wall.position = texture(data_texture, vec2(uv.x, 0.5)).rg;
 	wall.normal = texture(data_texture, vec2(uv.x, 1.0)).rgb;
 	

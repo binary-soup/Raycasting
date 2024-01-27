@@ -8,8 +8,9 @@ layout(rgba32f, binding = 0) uniform image2D output_data;
 layout(set = 0, binding = 1, std430) restrict buffer CameraData {
     vec2 origin;
     float rotation;
-    float fov;
     float far_plane;
+    float fov;
+    float pitch;
 }
 camera_data;
 
@@ -193,7 +194,10 @@ void main() {
     float x = lerp(tan(camera_data.fov), tan(-camera_data.fov), gl_GlobalInvocationID.x / float(gl_NumWorkGroups * 64));
     RayHit ray = raycast(atan(x));
 
-    imageStore(output_data, ivec2(gl_GlobalInvocationID.x, 0), vec4(ray.dist, ray.texture_index, ray.u, 0.0));
+    float height_offset = ray.dist * tan(camera_data.pitch);
+    ray.dist /= cos(camera_data.pitch);
+
+    imageStore(output_data, ivec2(gl_GlobalInvocationID.x, 0), vec4(ray.dist, height_offset, ray.texture_index, ray.u));
     imageStore(output_data, ivec2(gl_GlobalInvocationID.x, 1), vec4(ray.point, 0.0, 0.0));
     imageStore(output_data, ivec2(gl_GlobalInvocationID.x, 2), vec4(ray.normal, 0.0));
 }
