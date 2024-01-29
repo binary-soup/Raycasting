@@ -56,7 +56,9 @@ vec4 draw_ceiling(vec2 uv) {
 
 vec4 draw_floor(vec2 uv) {
 	float dist = (0.5 / (uv.y - 0.5 + tan(pitch)));
-	vec4 col = texture(floor_diffuse, vec2(uv.x, dist));
+	float nu = 2.0 * uv.x - 1.0;
+	
+	vec4 col = texture(floor_diffuse, vec2(nu * dist, dist));
 	
 	return col + sample_fog(dist);
 }
