@@ -85,7 +85,7 @@ vec4 calc_colour(vec2 uv) {
 	Wall wall;
 	wall.dist = data.r;
 	
-	float v = wall.dist * uv.y - wall.dist * 0.5 + 0.5 + data.g;
+	float v = wall.dist * uv.y - wall.dist * 0.5 + 0.5;
 	
 	if (v < 0.0) {
 		return draw_ceiling(uv);
@@ -99,8 +99,8 @@ vec4 calc_colour(vec2 uv) {
 		return fog_colour;
 	}
 	
+	wall.uv = vec2(data.g, v);
 	wall.texture_index = data.b;
-	wall.uv = vec2(data.a, v);
 	wall.position = texture(data_texture, vec2(uv.x, 0.5)).rg;
 	wall.normal = texture(data_texture, vec2(uv.x, 1.0)).rgb;
 	
@@ -108,5 +108,12 @@ vec4 calc_colour(vec2 uv) {
 }
 
 void fragment() {
-	COLOR = calc_colour(UV);
+	vec2 uv = UV;
+	uv.y = uv.y * 2.0 - 1.0;
+	
+	float alpha = atan(uv.y);
+	uv.y = sin(alpha) / cos(pitch + alpha);
+	
+	uv.y = (uv.y + 1.0) / 2.0;
+	COLOR = calc_colour(uv);
 }
