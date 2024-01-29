@@ -92,7 +92,6 @@ func _build_camera_data_uniform():
 		player.rotation,
 		player.far_plane,
 		player.fov,
-		player.pitch,
 	]).to_byte_array()
 
 	_build_storage_buffer_uniform(data, 1)

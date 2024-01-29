@@ -15,6 +15,7 @@ var pitch := 0.0
 
 @export var mouse_sensitivity := 0.215
 @export var fov := PI/4
+@export var vertical_fov := PI/24
 
 @export var far_plane := 20.0 :
 	set(val):
@@ -31,7 +32,7 @@ func _draw():
 func _physics_process(delta : float):
 	var rotate_amount := Main.MOUSE_MOTION * mouse_sensitivity
 	rotation += rotate_amount.x * delta
-	pitch = clamp(pitch + rotate_amount.y * delta, -PI/4, PI/4)
+	pitch = clamp(pitch + rotate_amount.y * delta, -vertical_fov, vertical_fov)
 	
 	_handle_movement()
 	

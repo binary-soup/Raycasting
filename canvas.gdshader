@@ -85,7 +85,7 @@ vec4 calc_colour(vec2 uv) {
 	Wall wall;
 	wall.dist = data.r;
 	
-	float v = wall.dist * uv.y - wall.dist * 0.5 + 0.5;
+	float v = wall.dist * uv.y - wall.dist * 0.5 + 0.5 + wall.dist * tan(pitch);
 	
 	if (v < 0.0) {
 		return draw_ceiling(uv);
@@ -108,12 +108,5 @@ vec4 calc_colour(vec2 uv) {
 }
 
 void fragment() {
-	vec2 uv = UV;
-	uv.y = uv.y * 2.0 - 1.0;
-	
-	float alpha = atan(uv.y);
-	uv.y = sin(alpha) / cos(pitch + alpha);
-	
-	uv.y = (uv.y + 1.0) / 2.0;
-	COLOR = calc_colour(uv);
+	COLOR = calc_colour(UV);
 }
