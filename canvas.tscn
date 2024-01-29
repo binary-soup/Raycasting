@@ -1,7 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://5005s1jul1gw"]
+[gd_scene load_steps=7 format=3 uid="uid://5005s1jul1gw"]
 
 [ext_resource type="Script" path="res://canvas.gd" id="1_6suj1"]
 [ext_resource type="Shader" path="res://canvas.gdshader" id="1_72wgp"]
+[ext_resource type="Texture2D" uid="uid://bnpcfti5ycofj" path="res://assets/uv_grid.png" id="2_hk4fp"]
 
 [sub_resource type="Gradient" id="Gradient_bcsj4"]
 offsets = PackedFloat32Array(0.675462, 0.905013)
@@ -22,6 +23,7 @@ shader_parameter/light_colour = Color(0.6, 0.6, 0.6, 1)
 shader_parameter/use_normal_mapping = true
 shader_parameter/use_parallax_mapping = true
 shader_parameter/fog_gradient = SubResource("GradientTexture1D_spxq0")
+shader_parameter/floor_diffuse = ExtResource("2_hk4fp")
 
 [node name="Canvas" type="TextureRect" groups=["DebugOptions"]]
 material = SubResource("ShaderMaterial_ilxe6")

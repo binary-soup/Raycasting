@@ -13,6 +13,8 @@ uniform vec4 fog_colour : source_color;
 uniform vec4 ceiling_colour : source_color;
 uniform vec4 floor_colour : source_color;
 
+uniform sampler2D floor_diffuse : repeat_enable;
+
 uniform sampler2DArray diffuse_textures;
 uniform sampler2D normal_map;
 uniform sampler2D depth_map;
@@ -54,7 +56,9 @@ vec4 draw_ceiling(vec2 uv) {
 
 vec4 draw_floor(vec2 uv) {
 	float dist = (0.5 / (uv.y - 0.5 + tan(pitch)));
-	return floor_colour + sample_fog(dist);
+	vec4 col = texture(floor_diffuse, vec2(uv.x, dist));
+	
+	return col + sample_fog(dist);
 }
 
 vec4 draw_wall(Wall wall) {
