@@ -11,10 +11,8 @@ uniform float far_plane;
 uniform sampler2D fog_gradient;
 uniform vec4 fog_colour : source_color;
 
-uniform vec4 ceiling_colour : source_color;
-uniform vec4 floor_colour : source_color;
-
 uniform sampler2D floor_diffuse : repeat_enable;
+uniform sampler2D ceiling_diffuse : repeat_enable;
 
 uniform sampler2DArray diffuse_textures;
 uniform sampler2D normal_map;
@@ -71,17 +69,21 @@ vec4 sample_fog(float dist) {
 	return fog_colour * texture(fog_gradient, vec2(dist / far_plane, 0.0));
 }
 
+vec4 sample_floor_ceiling(float u, float dist, sampler2D tex) {
+	float nu = 2.0 * u - 1.0;
+	
+	vec3 uvw = vec3(nu * dist, dist, 1.0) * rotate(rotation) * translate(vec2(1.0, -1.0) * view_pos);
+	return texture(tex, uvw.xy) + sample_fog(dist);
+}
+
 vec4 draw_ceiling(vec2 uv) {
 	float dist = (0.5 / (0.5 - tan(pitch) - uv.y));
-	return ceiling_colour + sample_fog(dist);
+	return sample_floor_ceiling(uv.x, dist, ceiling_diffuse);
 }
 
 vec4 draw_floor(vec2 uv) {
 	float dist = (0.5 / (uv.y - 0.5 + tan(pitch)));
-	float nu = 2.0 * uv.x - 1.0;
-	
-	vec3 uvw = vec3(nu * dist, dist, 1.0) * rotate(rotation) * translate(vec2(1.0, -1.0) * view_pos);
-	return texture(floor_diffuse, uvw.xy) + sample_fog(dist);
+	return sample_floor_ceiling(uv.x, dist, floor_diffuse);
 }
 
 vec4 draw_wall(Wall wall) {

@@ -1,7 +1,6 @@
 extends TileMap
 class_name Maze
 
-@export var ceiling_colour := Color.CADET_BLUE
 @export var floor_colour := Color.BURLYWOOD
 @export var diffuse_textures : CompressedTexture2DArray
 @export var normal_map : Texture2D
