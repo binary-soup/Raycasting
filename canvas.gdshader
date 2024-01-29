@@ -48,11 +48,13 @@ vec4 sample_fog(float dist) {
 }
 
 vec4 draw_ceiling(vec2 uv) {
-	return ceiling_colour + sample_fog(0.5 / (0.5 - uv.y));
+	float dist = (0.5 / (0.5 - tan(pitch) - uv.y));
+	return ceiling_colour + sample_fog(dist);
 }
 
 vec4 draw_floor(vec2 uv) {
-	return floor_colour + sample_fog(0.5 / (uv.y - 0.5));
+	float dist = (0.5 / (uv.y - 0.5 + tan(pitch)));
+	return floor_colour + sample_fog(dist);
 }
 
 vec4 draw_wall(Wall wall) {
@@ -85,7 +87,8 @@ vec4 calc_colour(vec2 uv) {
 	Wall wall;
 	wall.dist = data.r;
 	
-	float v = wall.dist * uv.y - wall.dist * 0.5 + 0.5 + wall.dist * tan(pitch);
+	float offset = 0.5 + wall.dist * tan(pitch);
+	float v = wall.dist * uv.y - wall.dist * 0.5 + offset;
 	
 	if (v < 0.0) {
 		return draw_ceiling(uv);
