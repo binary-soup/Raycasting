@@ -37,6 +37,27 @@ struct Wall {
 
 //===================
 
+mat3 translate(vec2 offset) {
+	return mat3(
+		vec3(1.0, 0.0, offset.x),
+		vec3(0.0, 1.0, offset.y),
+		vec3(0.0, 0.0, 1.0)
+	);
+}
+
+mat3 rotate(float rad) {
+	float c = cos(rad);
+	float s = sin(rad);
+	
+	return mat3(
+		vec3(c, s, 0.0),
+		vec3(-s, c, 0.0),
+		vec3(0.0, 0.0, 1.0)
+	);
+}
+
+//===================
+
 vec2 apply_parallax(vec2 uv, vec3 view_dir) {
 	float depth = texture(depth_map, uv).r;
 	return uv - view_dir.xy / view_dir.z * depth * depth_scale;
@@ -59,10 +80,8 @@ vec4 draw_floor(vec2 uv) {
 	float dist = (0.5 / (uv.y - 0.5 + tan(pitch)));
 	float nu = 2.0 * uv.x - 1.0;
 	
-	uv = vec2(nu * dist, dist) * mat2(vec2(cos(rotation), sin(rotation)), vec2(-sin(rotation), cos(rotation)));
-	vec4 col = texture(floor_diffuse, uv);
-	
-	return col + sample_fog(dist);
+	vec3 uvw = vec3(nu * dist, dist, 1.0) * rotate(rotation) * translate(vec2(1.0, -1.0) * view_pos);
+	return texture(floor_diffuse, uvw.xy) + sample_fog(dist);
 }
 
 vec4 draw_wall(Wall wall) {
