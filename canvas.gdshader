@@ -11,12 +11,9 @@ uniform float far_plane;
 uniform sampler2D fog_gradient;
 uniform vec4 fog_colour : source_color;
 
-uniform sampler2D floor_diffuse : repeat_enable;
-uniform sampler2D ceiling_diffuse : repeat_enable;
-
-uniform sampler2DArray diffuse_textures;
-uniform sampler2D normal_map;
-uniform sampler2D depth_map;
+uniform sampler2DArray wall_textures;
+uniform sampler2D floor_texture : repeat_enable;
+uniform sampler2D ceiling_texture : repeat_enable;
 
 uniform vec4 light_colour : source_color = vec4(vec3(0.6), 1.0);
 
@@ -57,12 +54,12 @@ mat3 rotate(float rad) {
 //===================
 
 vec2 apply_parallax(vec2 uv, vec3 view_dir) {
-	float depth = texture(depth_map, uv).r;
+	float depth = texture(wall_textures, vec3(uv, 1)).r;
 	return uv - view_dir.xy / view_dir.z * depth * depth_scale;
 }
 
 vec3 sample_normal_vector(vec2 uv) {
-	return 2.0 * texture(normal_map, uv).rgb - 1.0;
+	return 2.0 * texture(wall_textures, vec3(uv, 0)).rgb - 1.0;
 }
 
 vec4 sample_fog(float dist) {
@@ -78,12 +75,12 @@ vec4 sample_floor_ceiling(float u, float dist, sampler2D tex) {
 
 vec4 draw_ceiling(vec2 uv) {
 	float dist = (0.5 / (0.5 - tan(pitch) - uv.y));
-	return sample_floor_ceiling(uv.x, dist, ceiling_diffuse);
+	return sample_floor_ceiling(uv.x, dist, ceiling_texture);
 }
 
 vec4 draw_floor(vec2 uv) {
 	float dist = (0.5 / (uv.y - 0.5 + tan(pitch)));
-	return sample_floor_ceiling(uv.x, dist, floor_diffuse);
+	return sample_floor_ceiling(uv.x, dist, floor_texture);
 }
 
 vec4 draw_wall(Wall wall) {
@@ -96,7 +93,7 @@ vec4 draw_wall(Wall wall) {
 		uv = apply_parallax(uv, view_dir);
 	}
 	
-	vec4 colour = texture(diffuse_textures, vec3(uv, wall.texture_index));
+	vec4 colour = texture(wall_textures, vec3(uv, wall.texture_index));
 	vec3 light_dir = normalize(vec3(wall.normal.xy, -1.0)) * tbn;
 	
 	if (use_normal_mapping) {
@@ -132,7 +129,7 @@ vec4 calc_colour(vec2 uv) {
 	}
 	
 	wall.uv = vec2(data.g, v);
-	wall.texture_index = data.b;
+	wall.texture_index = data.b + 2.0;
 	wall.position = texture(data_texture, vec2(uv.x, 0.5)).rg;
 	wall.normal = texture(data_texture, vec2(uv.x, 1.0)).rgb;
 	

@@ -1,10 +1,7 @@
-[gd_scene load_steps=12 format=3 uid="uid://co5hhkcwleao7"]
+[gd_scene load_steps=9 format=3 uid="uid://co5hhkcwleao7"]
 
 [ext_resource type="Texture2D" uid="uid://b1fmx6nrf031c" path="res://assets/tilemap.png" id="1_outtt"]
 [ext_resource type="Script" path="res://maze.gd" id="2_4gupg"]
-[ext_resource type="CompressedTexture2DArray" uid="uid://biipvm3s2xoam" path="res://assets/bricks_coloured.jpg" id="3_f02c8"]
-[ext_resource type="Texture2D" uid="uid://uyrr7hw16445" path="res://assets/bricks_normal.jpg" id="3_nhbe8"]
-[ext_resource type="Texture2D" uid="uid://bnj7k1wwfgn0j" path="res://assets/bricks_depth.jpg" id="4_dmrxb"]
 
 [sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_qj8rq"]
 polygon = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
@@ -52,6 +49,3 @@ format = 2
 layer_0/tile_data = PackedInt32Array(-327686, 2, 0, -262150, 2, 0, -196614, 2, 0, -131078, 2, 0, -65542, 2, 0, -6, 2, 0, 65530, 2, 1, 131066, 2, 1, 196602, 2, 1, 262138, 2, 1, 327674, 2, 1, 393210, 2, 1, -327685, 2, 0, 393211, 2, 1, -327684, 2, 0, -196612, 65538, 1, -131076, 65538, 1, -65540, 65538, 1, 131068, 65538, 0, 196604, 65538, 0, 262140, 65538, 0, 393212, 2, 1, -327683, 2, 0, -196611, 65538, 1, -65539, 2, 0, 131069, 2, 1, 262141, 65538, 0, 393213, 2, 1, -327682, 2, 0, -196610, 65538, 1, -131074, 2, 0, -65538, 2, 0, 131070, 2, 1, 196606, 2, 1, 262142, 65538, 0, 393214, 2, 1, 393215, 2, 1, 327680, 65538, 1, -393215, 65538, 0, -262143, 2, 1, -196607, 65538, 0, -131071, 65538, 0, 65537, 65538, 1, 131073, 65538, 1, 196609, 2, 0, 327681, 65538, 1, -393214, 65538, 0, -262142, 2, 1, -131070, 65538, 0, 65538, 65538, 1, 196610, 2, 0, 327682, 65538, 1, -393213, 65538, 0, -262141, 2, 1, -196605, 2, 1, -131069, 2, 1, 65539, 2, 0, 131075, 2, 0, 196611, 2, 0, 327683, 65538, 1, -393212, 65538, 0, 327684, 65538, 1, -393211, 65538, 0, -327675, 65538, 0, -262139, 65538, 0, -196603, 65538, 0, -131067, 65538, 0, -65531, 65538, 0, 5, 65538, 1, 65541, 65538, 1, 131077, 65538, 1, 196613, 65538, 1, 262149, 65538, 1, 327685, 65538, 1, -393216, 65538, 0, -327681, 2, 0)
 script = ExtResource("2_4gupg")
 floor_colour = Color(0.658824, 0.505882, 0.305882, 1)
-diffuse_textures = ExtResource("3_f02c8")
-normal_map = ExtResource("3_nhbe8")
-depth_map = ExtResource("4_dmrxb")

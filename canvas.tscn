@@ -1,8 +1,10 @@
-[gd_scene load_steps=7 format=3 uid="uid://5005s1jul1gw"]
+[gd_scene load_steps=9 format=3 uid="uid://5005s1jul1gw"]
 
 [ext_resource type="Script" path="res://canvas.gd" id="1_6suj1"]
 [ext_resource type="Shader" path="res://canvas.gdshader" id="1_72wgp"]
-[ext_resource type="Texture2D" uid="uid://bnpcfti5ycofj" path="res://assets/uv_grid.png" id="2_hk4fp"]
+[ext_resource type="Texture2D" uid="uid://cvtoj5ble0i2h" path="res://assets/ceiling_diffuse.jpg" id="2_4b4td"]
+[ext_resource type="CompressedTexture2DArray" uid="uid://5xng4u7dx0l7" path="res://assets/walls.jpg" id="4_1mlk5"]
+[ext_resource type="Texture2D" uid="uid://b3n5cfal22ub" path="res://assets/floor_diffuse.jpg" id="5_krldh"]
 
 [sub_resource type="Gradient" id="Gradient_bcsj4"]
 offsets = PackedFloat32Array(0.675462, 0.905013)
@@ -22,8 +24,9 @@ shader_parameter/light_colour = Color(0.6, 0.6, 0.6, 1)
 shader_parameter/use_normal_mapping = true
 shader_parameter/use_parallax_mapping = true
 shader_parameter/fog_gradient = SubResource("GradientTexture1D_spxq0")
-shader_parameter/floor_diffuse = ExtResource("2_hk4fp")
-shader_parameter/ceiling_diffuse = ExtResource("2_hk4fp")
+shader_parameter/wall_textures = ExtResource("4_1mlk5")
+shader_parameter/floor_texture = ExtResource("5_krldh")
+shader_parameter/ceiling_texture = ExtResource("2_4b4td")
 
 [node name="Canvas" type="TextureRect" groups=["DebugOptions"]]
 material = SubResource("ShaderMaterial_ilxe6")

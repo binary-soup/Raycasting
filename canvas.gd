@@ -29,9 +29,6 @@ func _ready():
 
 func _init_shader_parameters():
 	material.set_shader_parameter("far_plane", player.far_plane)
-	material.set_shader_parameter("diffuse_textures", maze.diffuse_textures)
-	material.set_shader_parameter("normal_map", maze.normal_map)
-	material.set_shader_parameter("depth_map", maze.depth_map)
 
 
 func _init_compute():

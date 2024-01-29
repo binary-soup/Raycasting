@@ -1,0 +1,26 @@
+[remap]
+
+importer="2d_array_texture"
+type="CompressedTexture2DArray"
+uid="uid://5xng4u7dx0l7"
+path="res://.godot/imported/walls.jpg-e1eba048641bad8a16d1b0af9ce464cd.ctexarray"
+metadata={
+"vram_texture": false
+}
+
+[deps]
+
+source_file="res://assets/walls.jpg"
+dest_files=["res://.godot/imported/walls.jpg-e1eba048641bad8a16d1b0af9ce464cd.ctexarray"]
+
+[params]
+
+compress/mode=0
+compress/high_quality=false
+compress/lossy_quality=0.7
+compress/hdr_compression=1
+compress/channel_pack=0
+mipmaps/generate=false
+mipmaps/limit=-1
+slices/horizontal=2
+slices/vertical=3
