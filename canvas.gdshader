@@ -4,6 +4,7 @@ uniform sampler2D data_texture : filter_nearest;
 
 uniform vec2 view_pos;
 uniform float pitch;
+uniform float rotation;
 uniform float depth_scale = 0.1;
 
 uniform float far_plane;
@@ -58,7 +59,8 @@ vec4 draw_floor(vec2 uv) {
 	float dist = (0.5 / (uv.y - 0.5 + tan(pitch)));
 	float nu = 2.0 * uv.x - 1.0;
 	
-	vec4 col = texture(floor_diffuse, vec2(nu * dist, dist));
+	uv = vec2(nu * dist, dist) * mat2(vec2(cos(rotation), sin(rotation)), vec2(-sin(rotation), cos(rotation)));
+	vec4 col = texture(floor_diffuse, uv);
 	
 	return col + sample_fog(dist);
 }

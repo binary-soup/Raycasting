@@ -130,6 +130,7 @@ func _calculate_frame():
 	_build_camera_data_uniform()
 	material.set_shader_parameter("view_pos", player.get_origin())
 	material.set_shader_parameter("pitch", player.pitch)
+	material.set_shader_parameter("rotation", player.rotation)
 	
 	# start recording compute commands
 	var compute_list := rd.compute_list_begin()

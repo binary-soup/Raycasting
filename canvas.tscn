@@ -14,6 +14,7 @@ gradient = SubResource("Gradient_bcsj4")
 shader = ExtResource("1_72wgp")
 shader_parameter/view_pos = null
 shader_parameter/pitch = null
+shader_parameter/rotation = null
 shader_parameter/depth_scale = 0.02
 shader_parameter/far_plane = null
 shader_parameter/fog_colour = Color(1, 1, 1, 1)
