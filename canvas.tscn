@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://canvas.gd" id="1_6suj1"]
 [ext_resource type="Shader" path="res://canvas.gdshader" id="1_72wgp"]
-[ext_resource type="Texture2D" uid="uid://cvtoj5ble0i2h" path="res://assets/ceiling_diffuse.jpg" id="2_4b4td"]
+[ext_resource type="CompressedCubemap" uid="uid://cu6u4yd7qsulo" path="res://assets/sky_cubemap.png" id="3_eltht"]
 [ext_resource type="CompressedTexture2DArray" uid="uid://5xng4u7dx0l7" path="res://assets/walls.jpg" id="4_1mlk5"]
 [ext_resource type="Texture2D" uid="uid://b3n5cfal22ub" path="res://assets/floor_diffuse.jpg" id="5_krldh"]
 
@@ -26,7 +26,7 @@ shader_parameter/use_parallax_mapping = true
 shader_parameter/fog_gradient = SubResource("GradientTexture1D_spxq0")
 shader_parameter/wall_textures = ExtResource("4_1mlk5")
 shader_parameter/floor_texture = ExtResource("5_krldh")
-shader_parameter/ceiling_texture = ExtResource("2_4b4td")
+shader_parameter/skybox = ExtResource("3_eltht")
 
 [node name="Canvas" type="TextureRect" groups=["DebugOptions"]]
 material = SubResource("ShaderMaterial_ilxe6")

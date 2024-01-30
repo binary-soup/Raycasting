@@ -15,7 +15,7 @@ var pitch := 0.0
 
 @export var mouse_sensitivity := 0.215
 @export var fov := PI/4
-@export var vertical_fov := PI/24
+@export var vertical_fov := PI/2#/24
 
 @export var far_plane := 20.0 :
 	set(val):

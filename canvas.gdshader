@@ -13,7 +13,7 @@ uniform vec4 fog_colour : source_color;
 
 uniform sampler2DArray wall_textures;
 uniform sampler2D floor_texture : repeat_enable;
-uniform sampler2D ceiling_texture : repeat_enable;
+uniform samplerCube skybox;
 
 uniform vec4 light_colour : source_color = vec4(vec3(0.6), 1.0);
 
@@ -32,22 +32,13 @@ struct Wall {
 
 //===================
 
-mat3 translate(vec2 offset) {
-	return mat3(
-		vec3(1.0, 0.0, offset.x),
-		vec3(0.0, 1.0, offset.y),
-		vec3(0.0, 0.0, 1.0)
-	);
-}
-
-mat3 rotate(float rad) {
+mat2 rotate(float rad) {
 	float c = cos(rad);
 	float s = sin(rad);
 	
-	return mat3(
-		vec3(c, s, 0.0),
-		vec3(-s, c, 0.0),
-		vec3(0.0, 0.0, 1.0)
+	return mat2(
+		vec2(c, s),
+		vec2(-s, c)
 	);
 }
 
@@ -66,21 +57,19 @@ vec4 sample_fog(float dist) {
 	return fog_colour * texture(fog_gradient, vec2(dist / far_plane, 0.0));
 }
 
-vec4 sample_floor_ceiling(float u, float dist, sampler2D tex) {
-	float nu = 2.0 * u - 1.0;
-	
-	vec3 uvw = vec3(nu * dist, dist, 1.0) * rotate(rotation) * translate(vec2(1.0, -1.0) * view_pos);
-	return texture(tex, uvw.xy) + sample_fog(dist);
-}
-
 vec4 draw_ceiling(vec2 uv) {
-	float dist = (0.5 / (0.5 - tan(pitch) - uv.y));
-	return sample_floor_ceiling(uv.x, dist, ceiling_texture);
+	vec2 nuv = (2.0 * uv - vec2(1.0));
+	vec2 st = vec2(1.0, 0.0) * rotate(rotation);
+
+	return texture(skybox, vec3(st.x + st.y * nuv.x, -st.y + st.x * nuv.x, -nuv.y));
 }
 
 vec4 draw_floor(vec2 uv) {
 	float dist = (0.5 / (uv.y - 0.5 + tan(pitch)));
-	return sample_floor_ceiling(uv.x, dist, floor_texture);
+	float nu = 2.0 * uv.x - 1.0;
+	
+	uv = vec2(nu * dist, dist) * rotate(rotation) + vec2(1.0, -1.0) * view_pos;
+	return texture(floor_texture, uv) + sample_fog(dist);
 }
 
 vec4 draw_wall(Wall wall) {
