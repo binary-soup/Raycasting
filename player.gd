@@ -3,6 +3,7 @@ class_name Player
 
 signal physics_changed
 
+var view_velocity : Vector2
 var pitch := 0.0
 
 @onready var hit_box := $CollisionShape2D
@@ -32,18 +33,21 @@ func _draw():
 
 
 func _physics_process(delta : float):
-	var rotate_amount := Main.MOUSE_MOTION * mouse_sensitivity
-	rotation += rotate_amount.x * delta
-	
-	var extents := PI/2
-	if clamp_pitch: extents = pitch_clamp
-	
-	pitch = clamp(pitch + rotate_amount.y * delta, -extents, extents)
-	
+	_handle_view(delta)
 	_handle_movement()
 	
-	if !velocity.is_zero_approx() or !rotate_amount.is_zero_approx():
+	if !velocity.is_zero_approx() or !view_velocity.is_zero_approx():
 		emit_signal("physics_changed")
+
+
+func _handle_view(delta : float):
+	view_velocity = Main.MOUSE_MOTION * mouse_sensitivity * delta
+
+	var extents := PI/2
+	if clamp_pitch: extents = pitch_clamp
+
+	rotation += view_velocity.x
+	pitch = clamp(pitch + view_velocity.y, -extents, extents)
 
 
 func _handle_movement():
