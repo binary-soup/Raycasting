@@ -11,6 +11,7 @@ class_name PauseMenu
 		
 		if val:
 			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+			$VBoxContainer/ResumeButton.grab_focus()
 		else:
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 

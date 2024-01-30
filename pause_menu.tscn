@@ -40,14 +40,15 @@ text = "QUIT"
 
 [node name="DebugMenu" parent="." instance=ExtResource("2_36xkf")]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_top = 187.0
-offset_bottom = 187.0
-color = Color(0.207843, 0.207843, 0.207843, 0)
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 105.0
+offset_top = 86.0
+offset_right = 105.0
+offset_bottom = 86.0
+grow_horizontal = 1
+grow_vertical = 1
 
 [connection signal="pressed" from="VBoxContainer/ResumeButton" to="." method="_on_resume_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/QuitButton" to="." method="_on_quit_button_pressed"]
