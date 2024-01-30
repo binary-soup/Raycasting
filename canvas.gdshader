@@ -59,9 +59,14 @@ vec4 sample_fog(float dist) {
 
 vec4 draw_ceiling(vec2 uv) {
 	vec2 nuv = (2.0 * uv - vec2(1.0));
-	vec2 st = vec2(1.0, 0.0) * rotate(rotation);
-
-	return texture(skybox, vec3(st.x + st.y * nuv.x, -st.y + st.x * nuv.x, -nuv.y));
+	vec2 c1 = vec2(1.0, 0.0) * rotate(rotation);
+	vec2 c2 = vec2(1.0, 0.0) * rotate(pitch);
+	
+	vec3 xyz1 = vec3(c1.x + c1.y*nuv.x, -c1.y + c1.x*nuv.x, -nuv.y);
+	vec3 xyz2 = vec3(nuv.x, c2.x + c2.y*nuv.y, c2.y - c2.x*nuv.y);
+	
+	vec3 xyz = vec3(c1.x + c1.y*nuv.x, -c1.y + c2.x + c1.x*nuv.x + c2.y*nuv.y, c2.y - c2.x*nuv.y);
+	return texture(skybox, xyz2);
 }
 
 vec4 draw_floor(vec2 uv) {
