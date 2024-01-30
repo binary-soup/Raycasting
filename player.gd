@@ -3,8 +3,10 @@ class_name Player
 
 signal physics_changed
 
-var view_velocity : Vector2
-var pitch := 0.0
+var view_dir := Vector2()
+
+var prev_position : Vector2
+var prev_view_angle : Vector2
 
 @onready var hit_box := $CollisionShape2D
 @onready var view_cone := $ViewCone
@@ -28,6 +30,15 @@ var pitch := 0.0
 		view_cone.scale = Vector2(tan(fov) * val / (cone_size.x / 2), val / cone_size.y) * Constants.TILEMAP_CELL_SIZE
 
 
+var pitch := 0.0
+var view_angle := Vector2():
+	get:
+		return Vector2(rotation, pitch)
+	set(val):
+		rotation = val.x
+		pitch = val.y
+
+
 func _draw():
 	draw_circle(Vector2(), hit_box.shape.radius, Color.BLACK)
 
@@ -36,21 +47,25 @@ func _physics_process(delta : float):
 	_handle_view(delta)
 	_handle_movement()
 	
-	if !velocity.is_zero_approx() or !view_velocity.is_zero_approx():
+	if position != prev_position or view_angle != prev_view_angle:
 		emit_signal("physics_changed")
 
 
 func _handle_view(delta : float):
-	view_velocity = Main.MOUSE_MOTION * mouse_sensitivity * delta
-
+	prev_view_angle = view_angle
+	
 	var extents := PI/2
 	if clamp_pitch: extents = pitch_clamp
-
-	rotation += view_velocity.x
-	pitch = clamp(pitch + view_velocity.y, -extents, extents)
+	
+	view_dir += Main.MOUSE_MOTION * mouse_sensitivity * delta
+	view_dir.y = clamp(view_dir.y, -extents, extents)
+	
+	view_angle = view_dir
 
 
 func _handle_movement():
+	prev_position = position
+	
 	var target := _target_velocity()
 	var diff := target - velocity
 	
@@ -58,7 +73,7 @@ func _handle_movement():
 		velocity = target
 	else:
 		velocity += diff.normalized() * acceleration
-
+	
 	move_and_slide()
 
 
