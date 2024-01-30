@@ -6,9 +6,7 @@ signal physics_changed
 var prev_view_angle : Vector2
 var view_dir := Vector2()
 
-@onready var view_bob_tween := create_tween()
-var view_bob := Vector2()
-var view_bob_dir := 1.0
+var displacement := 0.0
 
 @onready var hit_box := $CollisionShape2D
 @onready var view_cone := $ViewCone
@@ -25,6 +23,7 @@ var view_bob_dir := 1.0
 @export var pitch_clamp := PI/24
 
 @export var view_bob_amount := PI/128
+@export var view_bob_speed_scaler := 0.2
 
 @export var far_plane := 20.0 :
 	set(val):
@@ -47,8 +46,8 @@ func _draw():
 	draw_circle(Vector2(), hit_box.shape.radius, Color.BLACK)
 
 
-func _physics_process(delta : float):
-	_handle_movement()
+func _physics_process(delta : float):	
+	_handle_movement(delta)
 	_handle_view(delta)
 	
 	if !velocity.is_zero_approx() or view_angle != prev_view_angle:
@@ -64,13 +63,11 @@ func _handle_view(delta : float):
 	view_dir += Main.MOUSE_MOTION * mouse_sensitivity * delta
 	view_dir.y = clamp(view_dir.y, -extents, extents)
 	
-	if !view_bob_tween.is_running() and !velocity.is_zero_approx():
-		_start_view_bobbing()
-	
-	view_angle = view_bob + view_dir
+	var bobbing := sin(displacement * view_bob_speed_scaler) * view_bob_amount
+	view_angle = Vector2(0.0, bobbing) + view_dir
 
 
-func _handle_movement():
+func _handle_movement(delta : float):
 	var target := _target_velocity()
 	var diff := target - velocity
 	
@@ -79,6 +76,7 @@ func _handle_movement():
 	else:
 		velocity += diff.normalized() * acceleration
 	
+	displacement += velocity.length() * delta
 	move_and_slide()
 
 
@@ -109,20 +107,6 @@ func _choose_speed() -> float:
 
 func get_origin() -> Vector2:
 	return position / Constants.TILEMAP_CELL_SIZE
-
-
-func _start_view_bobbing():
-	view_bob_tween.kill()
-	view_bob_tween = create_tween()
-	view_bob_tween.connect("finished", _start_view_bobbing)
-	
-	if velocity.is_zero_approx():
-		view_bob_tween.tween_property(self, "view_bob:y", 0.0, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
-	else:
-		view_bob_tween.tween_property(self, "view_bob:y", view_bob_dir * view_bob_amount, 0.5).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
-		view_bob_dir *= -1.0
-	
-	view_bob_tween.play()
 
 
 # DebugOptions group
