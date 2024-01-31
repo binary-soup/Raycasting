@@ -1,7 +1,7 @@
 extends ColorRect
 class_name PauseMenu
 
-@export var paused : bool:
+@export var paused : bool :
 	get:
 		return paused
 	set(val):
@@ -18,6 +18,10 @@ class_name PauseMenu
 
 func _ready():
 	paused = false
+
+
+func _process(_delta):
+	get_tree().call_group("AlwaysProcess", "_on_always_process")
 
 
 func _unhandled_input(_event):
