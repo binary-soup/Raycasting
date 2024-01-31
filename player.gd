@@ -8,17 +8,18 @@ var prev_step_dir := 1.0
 
 var view_dir := Vector2()
 
-var displacement := 0.0
+var tiles_traveled := 0.0
 var step_sounds : Bag
 
 @onready var hit_box := $CollisionShape2D
 @onready var view_cone := $ViewCone
 @onready var footsteps := $Footsteps
 
-@export var acceleration := 5.0
-@export var walk_speed := 30.0
-@export var strafe_speed := 20.0
-@export var sprint_speed := 50.0
+# tiles/second
+@export var acceleration := 0.3125
+@export var walk_speed := 1.875
+@export var strafe_speed := 1.25
+@export var sprint_speed := 3.125
 
 @export var mouse_sensitivity := 0.215
 @export var fov := PI/4
@@ -28,7 +29,7 @@ var step_sounds : Bag
 
 @export var use_view_bobbing := true
 @export var view_bob_fov := PI/256
-@export var step_factor := 0.25
+@export var step_factor := 3.5
 
 @export var far_plane := 20.0 :
 	set(val):
@@ -47,6 +48,7 @@ var view_angle := Vector2():
 
 
 func _ready():
+	hit_box.shape.radius = Constants.TILEMAP_CELL_SIZE / 4.0
 	_load_step_sounds()
 
 
@@ -82,14 +84,14 @@ func _handle_view(delta : float):
 	
 	var view_bob := Vector2()
 	if use_view_bobbing:
-		view_bob = Vector2(0.0, sin(displacement * step_factor)) * view_bob_fov
+		view_bob = Vector2(0.0, sin(tiles_traveled * step_factor)) * view_bob_fov
 	
 	view_angle = view_bob + view_dir
 
 
 func _handle_step_sounds():
 	var factor := step_factor * 0.8
-	var step := cos(displacement * factor) * factor
+	var step := cos(tiles_traveled * factor) * factor
 	
 	if sign(step) == prev_step_dir:
 		return
@@ -104,12 +106,14 @@ func _handle_movement(delta : float):
 	var target := _target_velocity()
 	var diff := target - velocity
 	
-	if acceleration >= diff.length():
+	var a := acceleration * Constants.TILEMAP_CELL_SIZE
+	
+	if a >= diff.length():
 		velocity = target
 	else:
-		velocity += diff.normalized() * acceleration
+		velocity += diff.normalized() * a
 	
-	displacement += velocity.length() * delta
+	tiles_traveled += velocity.length() / Constants.TILEMAP_CELL_SIZE * delta
 	move_and_slide()
 
 
@@ -128,7 +132,7 @@ func _target_velocity() -> Vector2:
 		target.x += 1
 	target.x *= strafe_speed
 	
-	return target.rotated(rotation)
+	return (target * Constants.TILEMAP_CELL_SIZE).rotated(rotation)
 
 
 func _choose_speed() -> float:
