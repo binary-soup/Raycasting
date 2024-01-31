@@ -9,8 +9,7 @@ var prev_step_dir := 1.0
 var view_dir := Vector2()
 
 var displacement := 0.0
-
-@onready var step_sounds : Bag
+var step_sounds : Bag
 
 @onready var hit_box := $CollisionShape2D
 @onready var view_cone := $ViewCone
@@ -89,7 +88,7 @@ func _handle_view(delta : float):
 
 
 func _handle_step_sounds():
-	var factor := step_factor / 1.2
+	var factor := step_factor * 0.8
 	var step := cos(displacement * factor) * factor
 	
 	if sign(step) == prev_step_dir:
