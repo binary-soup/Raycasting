@@ -34,7 +34,7 @@ layout_mode = 2
 button_pressed = true
 text = "Parallax Mapping"
 
-[node name="Label" type="Label" parent="CenterContainer/VBoxContainer"]
+[node name="FarPlaneLabel" type="Label" parent="CenterContainer/VBoxContainer"]
 layout_mode = 2
 text = "Far Plane:"
 
@@ -42,7 +42,7 @@ text = "Far Plane:"
 layout_mode = 2
 min_value = 3.0
 max_value = 20.0
-value = 20.0
+value = 3.0
 scrollable = false
 
 [node name="HSeparator" type="HSeparator" parent="CenterContainer/VBoxContainer"]

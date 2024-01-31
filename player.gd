@@ -31,7 +31,7 @@ var step_sounds : Bag
 @export var view_bob_fov := PI/256
 @export var step_factor := 3.5
 
-@export var far_plane := 20.0 :
+@export var far_plane : float :
 	set(val):
 		far_plane = val
 		
@@ -48,7 +48,7 @@ var view_angle := Vector2():
 
 
 func _ready():
-	hit_box.shape.radius = Constants.TILEMAP_CELL_SIZE / 4.0
+	hit_box.shape.radius = Constants.TILEMAP_CELL_SIZE / 4.0	
 	_load_step_sounds()
 
 
@@ -144,6 +144,12 @@ func _choose_speed() -> float:
 
 func get_origin() -> Vector2:
 	return position / Constants.TILEMAP_CELL_SIZE
+
+
+# DebugOptions group
+func _on_far_plane_value_changed(val : float):
+	far_plane = val
+	emit_signal("physics_changed")
 
 
 # DebugOptions group

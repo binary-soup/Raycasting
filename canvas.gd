@@ -167,5 +167,4 @@ func _on_parallax_mapping_toggled(val : bool):
 
 # DebugOptions group
 func _on_far_plane_value_changed(val : float):
-	player.far_plane = val
 	material.set_shader_parameter("far_plane", val)
