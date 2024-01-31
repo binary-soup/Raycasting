@@ -3,6 +3,9 @@ class_name Player
 
 signal physics_changed
 
+@export_node_path("Maze") var maze_path
+@onready var maze : Maze = get_node(maze_path)
+
 var prev_view_angle : Vector2
 var prev_step_dir := 1.0
 
@@ -132,7 +135,7 @@ func _target_velocity() -> Vector2:
 		target.x += 1
 	target.x *= strafe_speed
 	
-	return (target * Constants.TILEMAP_CELL_SIZE).rotated(rotation)
+	return (target * _get_speed_scale() * Constants.TILEMAP_CELL_SIZE).rotated(rotation)
 
 
 func _choose_speed() -> float:
@@ -140,6 +143,14 @@ func _choose_speed() -> float:
 		return sprint_speed
 	else:
 		return walk_speed
+
+
+func _get_speed_scale() -> float:
+	var tile := maze.get_cell_tile_data(2, get_origin().floor())
+	if tile == null:
+		return 1.0
+	
+	return tile.get_custom_data("speed_scale")
 
 
 func get_origin() -> Vector2:

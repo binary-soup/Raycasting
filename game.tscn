@@ -45,6 +45,7 @@ color = Color(0, 0, 0, 0.588235)
 [node name="Maze" parent="MiniMap/Game" instance=ExtResource("5_hboot")]
 
 [node name="Player" parent="MiniMap/Game" instance=ExtResource("6_rkwaj")]
+maze_path = NodePath("../Maze")
 
 [node name="FPSLabel" type="Label" parent="."]
 top_level = true

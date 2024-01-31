@@ -1,7 +1,8 @@
-[gd_resource type="TileSet" load_steps=20 format=3 uid="uid://ij6ensf36lys"]
+[gd_resource type="TileSet" load_steps=22 format=3 uid="uid://ij6ensf36lys"]
 
 [ext_resource type="Texture2D" uid="uid://didmevq70a78e" path="res://assets/tileset_red.jpg" id="1_2k130"]
 [ext_resource type="Texture2D" uid="uid://bglju4ofy6bh7" path="res://assets/tileset_yellow.jpg" id="2_5wgmh"]
+[ext_resource type="Texture2D" uid="uid://c8q81ci25wgqw" path="res://assets/tileset_speed_scale.png" id="3_nstut"]
 [ext_resource type="Texture2D" uid="uid://bh82bsr8iw42x" path="res://assets/tileset_green.jpg" id="3_wlrog"]
 [ext_resource type="Texture2D" uid="uid://cl3ye03mub7l7" path="res://assets/tileset_blue.jpg" id="4_7rr7s"]
 
@@ -106,6 +107,19 @@ texture_region_size = Vector2i(32, 32)
 2:2/0/physics_layer_0/linear_velocity = Vector2(0, 0)
 2:2/0/physics_layer_0/angular_velocity = 0.0
 2:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_1f4gn"]
+resource_name = "Speed Scale"
+texture = ExtResource("3_nstut")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+0:0/0/physics_layer_0/linear_velocity = Vector2(0, 0)
+0:0/0/physics_layer_0/angular_velocity = 0.0
+0:0/0/custom_data_0 = 0.5
+1:0/0 = 0
+1:0/0/physics_layer_0/linear_velocity = Vector2(0, 0)
+1:0/0/physics_layer_0/angular_velocity = 0.0
+1:0/0/custom_data_0 = 2.0
 
 [sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_h5nu6"]
 polygon = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
@@ -234,7 +248,10 @@ texture_region_size = Vector2i(32, 32)
 tile_size = Vector2i(32, 32)
 occlusion_layer_0/light_mask = 1
 physics_layer_0/collision_layer = 1
+custom_data_layer_0/name = "speed_scale"
+custom_data_layer_0/type = 3
 sources/0 = SubResource("TileSetAtlasSource_5bt87")
 sources/1 = SubResource("TileSetAtlasSource_lem6w")
 sources/2 = SubResource("TileSetAtlasSource_ux3c5")
 sources/3 = SubResource("TileSetAtlasSource_fu5hh")
+sources/100 = SubResource("TileSetAtlasSource_1f4gn")
