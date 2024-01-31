@@ -1,3 +1,3 @@
 extends Node
 
-const TILEMAP_CELL_SIZE := 16.0
+const TILEMAP_CELL_SIZE := 32.0

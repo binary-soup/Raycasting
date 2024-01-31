@@ -1,26 +1,11 @@
 extends TileMap
 class_name Maze
 
-@export var floor_colour := Color.BURLYWOOD
-
-const num_altas_rows := 2
-
 class Tile extends Resource:
 	var texture_index : int
 	
-	func _init(coords : Vector2i):
-		texture_index = coords.y * num_altas_rows + coords.x
-
-
-func _draw():
-	var bounds := get_used_rect()
-	
-	var top_left := bounds.position * rendering_quadrant_size
-	var top_right := Vector2(bounds.end.x, bounds.position.y) * rendering_quadrant_size
-	var bottom_left := Vector2(bounds.position.x, bounds.end.y) * rendering_quadrant_size
-	var bottom_right := bounds.end * rendering_quadrant_size
-	
-	draw_colored_polygon([top_left, top_right, bottom_right, bottom_left], floor_colour)
+	func _init(index : int):
+		texture_index = index
 
 
 func get_tiles() -> Array[Tile]:
@@ -34,6 +19,5 @@ func get_tiles() -> Array[Tile]:
 	return tiles
 
 
-func _new_tile(pos : Vector2i) -> Tile:
-	var coords := get_cell_atlas_coords(0, pos)
-	return Tile.new(coords)
+func _new_tile(coords : Vector2i) -> Tile:
+	return Tile.new(get_cell_source_id(1, coords))
