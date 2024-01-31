@@ -22,8 +22,9 @@ var displacement := 0.0
 @export var clamp_pitch := true
 @export var pitch_clamp := PI/24
 
-@export var view_bob_amount := PI/128
-@export var view_bob_speed_scaler := 0.2
+@export var use_view_bobbing := true
+@export var view_bob_fov := PI/256
+@export var view_bob_factor := 0.25
 
 @export var far_plane := 20.0 :
 	set(val):
@@ -46,7 +47,7 @@ func _draw():
 	draw_circle(Vector2(), hit_box.shape.radius, Color.BLACK)
 
 
-func _physics_process(delta : float):	
+func _physics_process(delta : float):
 	_handle_movement(delta)
 	_handle_view(delta)
 	
@@ -63,8 +64,11 @@ func _handle_view(delta : float):
 	view_dir += Main.MOUSE_MOTION * mouse_sensitivity * delta
 	view_dir.y = clamp(view_dir.y, -extents, extents)
 	
-	var bobbing := sin(displacement * view_bob_speed_scaler) * view_bob_amount
-	view_angle = Vector2(0.0, bobbing) + view_dir
+	var view_bob := Vector2()
+	if use_view_bobbing:
+		view_bob = Vector2(0.0, sin(displacement * view_bob_factor)) * view_bob_fov
+	
+	view_angle = view_bob + view_dir
 
 
 func _handle_movement(delta : float):
@@ -112,3 +116,8 @@ func get_origin() -> Vector2:
 # DebugOptions group
 func _on_clamp_player_pitch_toggled(val : bool):
 	clamp_pitch = val
+
+
+# DebugOptions group
+func _on_use_player_view_bobbing_toggled(val : bool):
+	use_view_bobbing = val

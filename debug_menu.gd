@@ -16,3 +16,7 @@ func _on_far_plane_value_changed(val : float):
 
 func _on_clamp_pitch_toggled(val : bool):
 	get_tree().call_group("DebugOptions", "_on_clamp_player_pitch_toggled", val)
+
+
+func _on_view_bobbing_toggled(val: bool):
+	get_tree().call_group("DebugOptions", "_on_use_player_view_bobbing_toggled", val)

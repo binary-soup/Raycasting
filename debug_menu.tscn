@@ -53,7 +53,13 @@ layout_mode = 2
 button_pressed = true
 text = "Clamp Player Pitch"
 
+[node name="ViewBobbing" type="CheckBox" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+button_pressed = true
+text = "Use View Bobbing"
+
 [connection signal="toggled" from="CenterContainer/VBoxContainer/NormalMapping" to="." method="_on_normal_mapping_toggled"]
 [connection signal="toggled" from="CenterContainer/VBoxContainer/ParallaxMapping" to="." method="_on_parallax_mapping_toggled"]
 [connection signal="value_changed" from="CenterContainer/VBoxContainer/FarPlane" to="." method="_on_far_plane_value_changed"]
 [connection signal="toggled" from="CenterContainer/VBoxContainer/ClampPitch" to="." method="_on_clamp_pitch_toggled"]
+[connection signal="toggled" from="CenterContainer/VBoxContainer/ViewBobbing" to="." method="_on_view_bobbing_toggled"]
