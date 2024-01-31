@@ -4,12 +4,17 @@ class_name Player
 signal physics_changed
 
 var prev_view_angle : Vector2
+var prev_step_dir := 1.0
+
 var view_dir := Vector2()
 
 var displacement := 0.0
 
+@onready var step_sounds : Bag
+
 @onready var hit_box := $CollisionShape2D
 @onready var view_cone := $ViewCone
+@onready var footsteps := $Footsteps
 
 @export var acceleration := 5.0
 @export var walk_speed := 30.0
@@ -24,7 +29,7 @@ var displacement := 0.0
 
 @export var use_view_bobbing := true
 @export var view_bob_fov := PI/256
-@export var view_bob_factor := 0.25
+@export var step_factor := 0.25
 
 @export var far_plane := 20.0 :
 	set(val):
@@ -32,7 +37,6 @@ var displacement := 0.0
 		
 		var cone_size : Vector2 = view_cone.texture.get_size()
 		view_cone.scale = Vector2(tan(fov) * val / (cone_size.x / 2), val / cone_size.y) * Constants.TILEMAP_CELL_SIZE
-
 
 var pitch := 0.0
 var view_angle := Vector2():
@@ -43,6 +47,18 @@ var view_angle := Vector2():
 		pitch = val.y
 
 
+func _ready():
+	_load_step_sounds()
+
+
+func _load_step_sounds():
+	var data := []
+	for i in range(12):
+		data.append(load("res://assets/sfx/stone_step_%d.wav" % [i+1]))
+	
+	step_sounds = Bag.new(data)
+
+
 func _draw():
 	draw_circle(Vector2(), hit_box.shape.radius, Color.BLACK)
 
@@ -50,6 +66,7 @@ func _draw():
 func _physics_process(delta : float):
 	_handle_movement(delta)
 	_handle_view(delta)
+	_handle_step_sounds()
 	
 	if !velocity.is_zero_approx() or view_angle != prev_view_angle:
 		emit_signal("physics_changed")
@@ -66,9 +83,22 @@ func _handle_view(delta : float):
 	
 	var view_bob := Vector2()
 	if use_view_bobbing:
-		view_bob = Vector2(0.0, sin(displacement * view_bob_factor)) * view_bob_fov
+		view_bob = Vector2(0.0, sin(displacement * step_factor)) * view_bob_fov
 	
 	view_angle = view_bob + view_dir
+
+
+func _handle_step_sounds():
+	var factor := step_factor / 1.2
+	var step := cos(displacement * factor) * factor
+	
+	if sign(step) == prev_step_dir:
+		return
+	
+	prev_step_dir = sign(step)
+	
+	footsteps.stream = step_sounds.choose()
+	footsteps.play()
 
 
 func _handle_movement(delta : float):
