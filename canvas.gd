@@ -117,12 +117,7 @@ func _rect2i_to_byte_array(rect : Rect2i) -> PackedByteArray:
 
 
 func _tile_to_byte_array(tile : Maze.Tile) -> PackedByteArray:
-	var data : PackedByteArray = []
-	
-	data.append_array(PackedInt32Array([tile.texture_index]).to_byte_array())
-	data.append_array(PackedFloat32Array([tile.speed_scale]).to_byte_array())
-	
-	return data
+	return PackedInt32Array([tile.texture_index]).to_byte_array()
 
 
 func _calculate_frame():

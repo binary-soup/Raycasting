@@ -16,7 +16,6 @@ camera_data;
 
 struct Tile {
     int texture_index;
-    float speed_scale;
 };
 
 struct Rect2i {

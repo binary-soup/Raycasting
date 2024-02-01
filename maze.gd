@@ -3,22 +3,9 @@ class_name Maze
 
 class Tile extends Resource:
 	var texture_index : int
-	var speed_scale : float
 	
-	func _init(index : int, data : CustomTileData):
+	func _init(index : int):
 		texture_index = index
-		speed_scale = data.speed_scale
-
-
-class CustomTileData extends Resource:
-	var speed_scale := 1.0
-	
-	func _init(data : TileData):
-		if data == null:
-			return
-		
-		speed_scale = data.get_custom_data("speed_scale")
-
 
 func get_tiles() -> Array[Tile]:
 	var tiles : Array[Tile] = []
@@ -32,4 +19,4 @@ func get_tiles() -> Array[Tile]:
 
 
 func _new_tile(coords : Vector2i) -> Tile:
-	return Tile.new(get_cell_source_id(1, coords), CustomTileData.new(get_cell_tile_data(2, coords)))
+	return Tile.new(get_cell_source_id(1, coords))
