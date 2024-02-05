@@ -9,6 +9,10 @@ var warp_offset : Vector2
 var warp_angle : float
 
 
+func get_coords() -> Vector2i:
+	return Vector2i((position / Constants.TILEMAP_CELL_SIZE).floor())
+
+
 func _ready():
 	tile_dir = Vector2(0.0, -1.0).rotated(rotation)
 	warp_offset = target.position - position
