@@ -16,6 +16,8 @@ camera_data;
 
 struct Tile {
     int texture_index;
+    float warp_angle;
+    vec2 warp_offset;
 };
 
 struct Rect2i {

@@ -97,7 +97,7 @@ func _build_tilemap_uniform():
 	
 	data.append_array(_rect2i_to_byte_array(maze.get_used_rect()))
 	
-	for tile in maze.get_tiles():
+	for tile in maze.build_tiles_array():
 		data.append_array(_tile_to_byte_array(tile))
 		
 	_build_storage_buffer_uniform(data, 2)
@@ -117,7 +117,17 @@ func _rect2i_to_byte_array(rect : Rect2i) -> PackedByteArray:
 
 
 func _tile_to_byte_array(tile : Maze.Tile) -> PackedByteArray:
-	return PackedInt32Array([tile.texture_index]).to_byte_array()
+	var data : PackedByteArray = []
+	
+	data.append_array(PackedInt32Array([
+		tile.texture_index
+	]).to_byte_array())
+	
+	data.append_array(PackedFloat32Array([
+		tile.warp_angle, tile.warp_offset.x, tile.warp_offset.y
+	]).to_byte_array())
+	
+	return data
 
 
 func _calculate_frame():
