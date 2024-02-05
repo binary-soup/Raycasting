@@ -1,10 +1,13 @@
 extends TileMap
 class_name Maze
 
+var warp_fields := {}
+
+
 class Tile extends Resource:
 	var texture_index : int
-	var warp_angle := 0.0
 	var warp_offset := Vector2()
+	var warp_angle := 0.0
 	
 	func _init(index : int):
 		texture_index = index
@@ -22,6 +25,20 @@ func build_tiles_array() -> Array[Tile]:
 	return tiles
 
 
+func get_warp(pos : Vector2) -> WarpField:
+	var coords := Vector2i((pos / Constants.TILEMAP_CELL_SIZE).floor())
+	
+	if coords in warp_fields:
+		return warp_fields[coords]
+		
+	return null
+
+
+func _ready():
+	for warp in $Warps.get_children():
+		warp_fields[warp.get_coords()] = warp
+
+
 func _fill_tiles(tiles : Array[Tile], bounds : Rect2i):
 	var i := 0
 	for y in range(bounds.position.y, bounds.end.y):
@@ -35,9 +52,9 @@ func _new_tile(coords : Vector2i) -> Tile:
 
 
 func _set_warps(tiles : Array[Tile], cols : int, index_offset : int):
-	for warp in $Warps.get_children():
-		var coords : Vector2i = warp.get_coords()
-		var index := coords.y * cols + coords.x - index_offset
+	for key in warp_fields.keys():
+		var index : int = key.y * cols + key.x - index_offset
+		var warp : WarpField = warp_fields[key]
 		
-		tiles[index].warp_angle = warp.warp_angle
-		tiles[index].warp_offset = warp.warp_offset / Constants.TILEMAP_CELL_SIZE
+		tiles[index].warp_offset = warp.offset / Constants.TILEMAP_CELL_SIZE
+		tiles[index].warp_angle = warp.angle

@@ -50,6 +50,7 @@ text = "FPS: ?"
 script = ExtResource("3_2xmlg")
 
 [node name="Canvas" parent="." instance=ExtResource("2_cqsjv")]
+z_index = -1
 layout_mode = 1
 expand_mode = 1
 player_path = NodePath("../MiniMap/Game/Player")

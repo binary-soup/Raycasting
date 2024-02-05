@@ -1,22 +1,11 @@
-[gd_scene load_steps=4 format=3 uid="uid://bwbpgqsxmu1rl"]
+[gd_scene load_steps=3 format=3 uid="uid://bwbpgqsxmu1rl"]
 
 [ext_resource type="Script" path="res://warp_field.gd" id="1_0agvc"]
 [ext_resource type="Texture2D" uid="uid://dpfkt4ovkrrms" path="res://assets/warp_field.png" id="1_l36ma"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_e4d67"]
-size = Vector2(32, 32)
-
-[node name="WarpField" type="Area2D"]
-collision_layer = 4
-collision_mask = 2
+[node name="WarpField" type="Node2D"]
 script = ExtResource("1_0agvc")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("RectangleShape2D_e4d67")
-debug_color = Color(1, 1, 1, 0.419608)
-
-[node name="Sprite" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="."]
 texture_filter = 1
 texture = ExtResource("1_l36ma")
-
-[connection signal="area_entered" from="." to="." method="_on_area_entered"]

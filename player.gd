@@ -54,11 +54,6 @@ func get_origin() -> Vector2:
 	return position / Constants.TILEMAP_CELL_SIZE
 
 
-func warp_rotation(angle : float):
-	view_dir.x += angle
-	velocity = velocity.rotated(angle)
-
-
 func _ready():
 	hit_box.shape.radius = Constants.TILEMAP_CELL_SIZE / 4.0
 	_load_step_sounds()
@@ -126,6 +121,8 @@ func _handle_movement(delta : float):
 		velocity += diff.normalized() * a
 	
 	tiles_traveled += velocity.length() / Constants.TILEMAP_CELL_SIZE * delta
+	
+	_handle_warp(delta)
 	move_and_slide()
 
 
@@ -152,6 +149,16 @@ func _choose_speed() -> float:
 		return sprint_speed
 	else:
 		return walk_speed
+
+
+func _handle_warp(delta : float):
+	var warp := maze.get_warp(position + velocity * delta)
+	if warp == null:
+		return
+	
+	position = (position + warp.dir * Constants.TILEMAP_CELL_SIZE - warp.position).rotated(warp.angle) + warp.position + warp.offset
+	view_dir.x += warp.angle
+	velocity = velocity.rotated(warp.angle)
 
 
 # DebugOptions group
