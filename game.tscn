@@ -16,12 +16,6 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_7cuca")
 
-[node name="Canvas" parent="." instance=ExtResource("2_cqsjv")]
-layout_mode = 1
-expand_mode = 1
-player_path = NodePath("../MiniMap/Game/Player")
-maze_path = NodePath("../MiniMap/Game/Maze")
-
 [node name="MiniMap" type="Control" parent="."]
 visible = false
 layout_mode = 1
@@ -54,6 +48,12 @@ offset_right = 43.0
 offset_bottom = 26.0
 text = "FPS: ?"
 script = ExtResource("3_2xmlg")
+
+[node name="Canvas" parent="." instance=ExtResource("2_cqsjv")]
+layout_mode = 1
+expand_mode = 1
+player_path = NodePath("../MiniMap/Game/Player")
+maze_path = NodePath("../MiniMap/Game/Maze")
 
 [node name="PauseMenu" parent="." instance=ExtResource("4_maopv")]
 process_mode = 3

@@ -17,7 +17,7 @@ func build_tiles_array() -> Array[Tile]:
 	tiles.resize(bounds.size.x * bounds.size.y)
 	
 	_fill_tiles(tiles, bounds)
-	_set_warps(tiles, bounds.size.x)
+	_set_warps(tiles, bounds.size.x, bounds.position.y * bounds.size.x + bounds.position.x)
 	
 	return tiles
 
@@ -34,11 +34,10 @@ func _new_tile(coords : Vector2i) -> Tile:
 	return Tile.new(get_cell_source_id(1, coords))
 
 
-func _set_warps(tiles : Array[Tile], cols : int):
+func _set_warps(tiles : Array[Tile], cols : int, index_offset : int):
 	for warp in $Warps.get_children():
 		var coords : Vector2i = warp.get_coords()
-		var tile := tiles[coords.y * cols + coords.x]
+		var index := coords.y * cols + coords.x - index_offset
 		
-		tile.warp_angle = warp.warp_angle
-		tile.warp_offset = warp.warp_offset
-		
+		tiles[index].warp_angle = warp.warp_angle
+		tiles[index].warp_offset = warp.warp_offset / Constants.TILEMAP_CELL_SIZE

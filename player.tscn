@@ -6,7 +6,7 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_bgty5"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_vlpx5"]
-radius = 0.01
+radius = 0.1
 
 [node name="Player" type="CharacterBody2D" groups=["DebugOptions"]]
 motion_mode = 1

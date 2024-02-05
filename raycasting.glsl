@@ -40,7 +40,7 @@ struct RayHit {
     vec2 point;
     float dist;
     float u;
-    vec3 normal;
+    vec2 normal;
     int texture_index;
 };
 
@@ -50,10 +50,10 @@ struct Rect2 {
 };
 
 const vec2 STEP_OFFSET = vec2(0.001);
-const vec3 UP = vec3(0.0, -1.0, 0.0);
-const vec3 DOWN = vec3(0.0, 1.0, 0.0);
-const vec3 LEFT = vec3(-1.0, 0.0, 0.0);
-const vec3 RIGHT = vec3(1.0, 0.0, 0.0);
+const vec2 UP = vec2(0.0, -1.0);
+const vec2 DOWN = vec2(0.0, 1.0);
+const vec2 LEFT = vec2(-1.0, 0.0);
+const vec2 RIGHT = vec2(1.0, 0.0);
 
 //============================
 
@@ -164,28 +164,47 @@ Tile get_tile(vec2 point) {
     return tilemap.tiles[index - tilemap_index_offset];
 }
 
+Ray calc_next_ray(Ray ray, RayHit hit, Tile tile) {
+    if (tile.warp_offset == vec2(0.0, 0.0)) {
+        ray.pos = hit.point;
+        return ray;
+    }
+
+    vec2 origin = floor_vec(hit.point) + vec2(0.5, 0.5);
+    mat2 rot = rotation(tile.warp_angle);
+
+    ray.pos = (hit.point - hit.normal - origin) * rot + origin + tile.warp_offset;
+    ray.dir *= rot;
+
+    return ray;
+}
+
 RayHit raycast(float angle) {
     Ray ray;
     ray.pos = camera_data.origin;
     ray.dir = rotation(angle - camera_data.rotation) * vec2(0.0, -1.0);
 
-    vec2 origin = ray.pos;
+    float dist = 0.0;
 
     while (true) {
         RayHit hit = calc_intersection(ray);
 
-        hit.dist = length(hit.point - origin) * cos(angle);
+        dist += length(hit.point - ray.pos) * cos(angle);
+        hit.dist = dist;
+
         if (hit.dist > camera_data.far_plane) {
             hit.dist = camera_data.far_plane;
             return hit;
         }
 
-        hit.texture_index = get_tile(hit.point).texture_index;
+        Tile tile = get_tile(hit.point);
+
+        hit.texture_index = tile.texture_index;
         if (hit.texture_index >= 0) {
             return hit;
         }
 
-        ray.pos = hit.point;
+        ray = calc_next_ray(ray, hit, tile);
     }
 }
 
@@ -198,5 +217,5 @@ void main() {
 
     imageStore(output_data, ivec2(gl_GlobalInvocationID.x, 0), vec4(ray.dist, ray.u, ray.texture_index, 0.0));
     imageStore(output_data, ivec2(gl_GlobalInvocationID.x, 1), vec4(ray.point, 0.0, 0.0));
-    imageStore(output_data, ivec2(gl_GlobalInvocationID.x, 2), vec4(ray.normal, 0.0));
+    imageStore(output_data, ivec2(gl_GlobalInvocationID.x, 2), vec4(ray.normal, 0.0, 0.0));
 }

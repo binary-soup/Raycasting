@@ -60,7 +60,7 @@ func warp_rotation(angle : float):
 
 
 func _ready():
-	hit_box.shape.radius = Constants.TILEMAP_CELL_SIZE / 4.0	
+	hit_box.shape.radius = Constants.TILEMAP_CELL_SIZE / 4.0
 	_load_step_sounds()
 
 

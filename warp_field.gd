@@ -22,7 +22,7 @@ func _ready():
 func _on_area_entered(area : Area2D):
 	var player : Player = area.get_parent()
 	
-	player.position += tile_dir * (Constants.TILEMAP_CELL_SIZE + 0.02)
+	player.position += tile_dir * (Constants.TILEMAP_CELL_SIZE + 0.2)
 	player.position = (player.position - position).rotated(warp_angle) + position + warp_offset
 	
 	player.warp_rotation(warp_angle)
