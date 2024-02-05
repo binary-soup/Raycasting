@@ -50,6 +50,15 @@ var view_angle := Vector2():
 		pitch = val.y
 
 
+func get_origin() -> Vector2:
+	return position / Constants.TILEMAP_CELL_SIZE
+
+
+func warp_rotation(angle : float):
+	view_dir.x += angle
+	velocity = velocity.rotated(angle)
+
+
 func _ready():
 	hit_box.shape.radius = Constants.TILEMAP_CELL_SIZE / 4.0	
 	_load_step_sounds()
@@ -128,14 +137,14 @@ func _target_velocity() -> Vector2:
 	if Input.is_action_pressed("move_back"):
 		target.y += 1
 	target.y *= _choose_speed()
-		
+	
 	if Input.is_action_pressed("move_left"):
 		target.x -= 1
 	if Input.is_action_pressed("move_right"):
 		target.x += 1
 	target.x *= strafe_speed
 	
-	return (target * Constants.TILEMAP_CELL_SIZE).rotated(rotation)
+	return (target * Constants.TILEMAP_CELL_SIZE).rotated(view_dir.x)
 
 
 func _choose_speed() -> float:
@@ -143,10 +152,6 @@ func _choose_speed() -> float:
 		return sprint_speed
 	else:
 		return walk_speed
-
-
-func get_origin() -> Vector2:
-	return position / Constants.TILEMAP_CELL_SIZE
 
 
 # DebugOptions group
