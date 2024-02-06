@@ -2,7 +2,7 @@ shader_type canvas_item;
 
 uniform sampler2D data_texture : filter_nearest;
 
-uniform vec2 view_pos;
+uniform vec2 origin;
 uniform vec2 view_dir;
 uniform float depth_scale = 0.1;
 
@@ -68,7 +68,7 @@ vec4 draw_floor(vec2 uv) {
 	float dist = (0.5 / (uv.y - 0.5 + tan(view_dir.y)));
 	float nu = 2.0 * uv.x - 1.0;
 	
-	uv = vec2(nu * dist, dist) * rotate(view_dir.x) + vec2(1.0, -1.0) * view_pos;
+	uv = vec2(nu * dist, dist) * rotate(view_dir.x) + vec2(1.0, -1.0) * origin;
 	return texture(floor_texture, uv) + sample_fog(dist);
 }
 
@@ -78,7 +78,7 @@ vec4 draw_wall(Wall wall) {
 	mat3 tbn = mat3(cross(wall.normal, BITANGENT), BITANGENT, normal);
 	
 	if (use_parallax_mapping) {
-		vec3 dir = normalize((vec3(view_pos, 0.5) - vec3(wall.position, uv.y))) * tbn;
+		vec3 dir = normalize((vec3(origin, 0.5) - vec3(wall.position, uv.y))) * tbn;
 		uv = apply_parallax(uv, dir);
 	}
 	

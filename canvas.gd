@@ -80,7 +80,7 @@ func _build_output_data_texture_uniform():
 
 
 func _build_camera_data_uniform():
-	var origin := player.get_origin()
+	var origin := player.get_physical_origin()
 	
 	var data : PackedByteArray = PackedFloat32Array([
 		origin.x, origin.y,
@@ -133,8 +133,8 @@ func _tile_to_byte_array(tile : Maze.Tile) -> PackedByteArray:
 func _calculate_frame():
 	# rebuild data uniforms that change every frame
 	_build_camera_data_uniform()
-	material.set_shader_parameter("view_pos", player.get_origin())
-	material.set_shader_parameter("view_dir", player.virtual_dir)
+	material.set_shader_parameter("origin", player.virtual_pos)
+	material.set_shader_parameter("view_dir", player.get_virtual_view_dir())
 	
 	# start recording compute commands
 	var compute_list := rd.compute_list_begin()

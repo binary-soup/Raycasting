@@ -9,8 +9,11 @@ signal physics_changed
 var prev_view_angle : Vector2
 var prev_step_dir := 1.0
 
-var virtual_dir := Vector2()
 var physical_dir := Vector2()
+var virtual_dir := Vector2()
+var view_bob := 0.0
+
+var virtual_pos := Vector2()
 
 var tiles_traveled := 0.0
 var step_sounds : Bag
@@ -51,8 +54,12 @@ var view_angle : Vector2 :
 		pitch = val.y
 
 
-func get_origin() -> Vector2:
+func get_physical_origin() -> Vector2:
 	return position / Constants.TILEMAP_CELL_SIZE
+
+
+func get_virtual_view_dir() -> Vector2:
+	return virtual_dir + Vector2(0.0, view_bob)
 
 
 func _ready():
@@ -90,11 +97,10 @@ func _handle_view(delta : float):
 	virtual_dir += Main.MOUSE_MOTION * mouse_sensitivity * delta
 	virtual_dir.y = clamp(virtual_dir.y, -extents, extents)
 	
-	var view_bob := Vector2()
 	if use_view_bobbing:
-		view_bob = Vector2(0.0, sin(tiles_traveled * step_factor)) * view_bob_fov
+		view_bob = sin(tiles_traveled * step_factor) * view_bob_fov
 	
-	view_angle = physical_dir + virtual_dir + view_bob
+	view_angle = physical_dir + virtual_dir
 
 
 func _handle_step_sounds():
@@ -121,7 +127,9 @@ func _handle_movement(delta : float):
 	else:
 		velocity += diff.normalized() * a
 	
-	tiles_traveled += velocity.length() / Constants.TILEMAP_CELL_SIZE * delta
+	var traveled := velocity / Constants.TILEMAP_CELL_SIZE * delta
+	tiles_traveled += traveled.length()
+	virtual_pos += traveled.rotated(-physical_dir.x)
 	
 	_handle_warp(delta)
 	move_and_slide()
