@@ -2,7 +2,7 @@
 
 [ext_resource type="TileSet" uid="uid://ij6ensf36lys" path="res://assets/tileset.tres" id="1_l1fop"]
 [ext_resource type="Script" path="res://maze.gd" id="2_4gupg"]
-[ext_resource type="PackedScene" uid="uid://bwbpgqsxmu1rl" path="res://warp_field.tscn" id="3_u10lr"]
+[ext_resource type="PackedScene" uid="uid://bwbpgqsxmu1rl" path="res://field_warp.tscn" id="3_u10lr"]
 
 [node name="Maze" type="TileMap"]
 texture_filter = 1

@@ -24,7 +24,7 @@ func build_tiles_array() -> Array[Tile]:
 	return tiles
 
 
-func get_warp(pos : Vector2) -> WarpField:
+func get_warp(pos : Vector2) -> Warp:
 	var coords := Vector2i((pos / Constants.TILEMAP_CELL_SIZE).floor())
 	
 	if coords in warp_fields:
@@ -53,7 +53,7 @@ func _new_tile(coords : Vector2i) -> Tile:
 func _set_warps(tiles : Array[Tile], cols : int, index_offset : int):
 	for key in warp_fields.keys():
 		var index : int = key.y * cols + key.x - index_offset
-		var warp : WarpField = warp_fields[key]
+		var warp : Warp = warp_fields[key]
 		
 		tiles[index].warp_offset = warp.offset / Constants.TILEMAP_CELL_SIZE
 		tiles[index].warp_angle = warp.angle

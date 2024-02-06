@@ -165,7 +165,7 @@ Ray warp_ray(Ray ray, Tile tile) {
     }
 
     vec2 origin = floor_vec(ray.pos) + vec2(0.5, 0.5);
-    mat2 rot = rotation(tile.warp_angle);
+    mat2 rot = rotation((ray.normal.y - ray.normal.x) * tile.warp_angle);
 
     ray.pos = (ray.pos - ray.normal - origin) * rot + origin + tile.warp_offset;
     ray.dir *= rot;

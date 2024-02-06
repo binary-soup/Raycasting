@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://bwbpgqsxmu1rl"]
+
+[ext_resource type="Script" path="res://field_warp.gd" id="1_1oh3r"]
+[ext_resource type="Texture2D" uid="uid://dpfkt4ovkrrms" path="res://assets/warp_field.png" id="2_qmv5k"]
+
+[node name="FieldWarp" type="Node2D"]
+script = ExtResource("1_1oh3r")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = ExtResource("2_qmv5k")
