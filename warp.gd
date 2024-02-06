@@ -1,8 +1,8 @@
 extends Node2D
 class_name Warp
 
-var offset : Vector2
-var angle : float
+var offset := Vector2()
+var angle := 0.0
 
 
 func get_coords() -> Vector2i:

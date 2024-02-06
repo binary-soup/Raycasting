@@ -9,3 +9,4 @@ script = ExtResource("1_1oh3r")
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture_filter = 1
 texture = ExtResource("2_qmv5k")
+offset = Vector2(0, 16)

@@ -8,5 +8,7 @@ class_name FieldWarp
 func _ready():
 	offset = target.position - position
 	
-	var dir := Vector2(0.0, -1.0).rotated(rotation + PI)
-	angle = (rotation - target.rotation) / (dir.y - dir.x)
+	var normal := Vector2.DOWN.rotated(rotation)
+	var target_normal := Vector2.DOWN.rotated(target.rotation)
+	
+	angle = (rotation - target.rotation + PI * normal.dot(target_normal)) / (normal.y - normal.x)
