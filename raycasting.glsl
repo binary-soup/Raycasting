@@ -160,7 +160,7 @@ Tile get_tile(vec2 point) {
 }
 
 Ray warp_ray(Ray ray, Tile tile) {
-    if (tile.warp_offset == vec2(0.0, 0.0)) {
+    if (tile.warp_offset == vec2(0.0, 0.0) && tile.warp_angle == 0.0) {
         return ray;
     }
 

@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://bmldwfwo7k2am"]
+
+[ext_resource type="Script" path="res://corner_warp.gd" id="1_hs7sw"]
+[ext_resource type="Texture2D" uid="uid://dpfkt4ovkrrms" path="res://assets/warp_field.png" id="2_1e3g8"]
+
+[node name="CornerWarp" type="Node2D"]
+script = ExtResource("1_hs7sw")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
+texture = ExtResource("2_1e3g8")
+offset = Vector2(0, 16)
+
+[node name="Sprite2D2" type="Sprite2D" parent="."]
+texture_filter = 1
+rotation = -1.5708
+texture = ExtResource("2_1e3g8")
+offset = Vector2(0, 16)
