@@ -52,7 +52,7 @@ func _on_resized():
 	var image := Image.create(canvas_size.x, canvas_size.y, false, Image.FORMAT_RGBAF)
 	texture = ImageTexture.create_from_image(image)
 	
-	output_data_size = Vector2i(canvas_size.x, 3)
+	output_data_size = Vector2i(canvas_size.x, 2)
 	_build_output_data_texture_uniform()
 	
 	_calculate_frame()

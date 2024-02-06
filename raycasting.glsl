@@ -34,10 +34,6 @@ tilemap;
 struct Ray {
     vec2 pos;
     vec2 dir;
-};
-
-struct RayHit {
-    vec2 point;
     float dist;
     float u;
     vec2 normal;
@@ -97,63 +93,62 @@ vec2 intersect_vertical_line(float x, float slope, vec2 pos) {
     return vec2(x, (x - initial) * slope);
 }
 
-RayHit calc_intersection(Ray ray) {
+Ray calc_intersection(Ray ray) {
     Rect2 cell = new_rect(floor_vec(ray.pos) - STEP_OFFSET, vec2(1.0, 1.0) + STEP_OFFSET);
-    RayHit hit;
 
     if (ray.dir.y == -1.0) {
-        hit.point = vec2(ray.pos.x, cell.start.y);
-        hit.u = calc_u(cell.start.x, cell.end.x, hit.point.x);
-        hit.normal = DOWN;
-        return hit;
+        ray.pos = vec2(ray.pos.x, cell.start.y);
+        ray.u = calc_u(cell.start.x, cell.end.x, ray.pos.x);
+        ray.normal = DOWN;
+        return ray;
     }
 
     if (ray.dir.y == 1.0) {
-        hit.point = vec2(ray.pos.x, cell.end.y);
-        hit.u = calc_u(cell.end.x, cell.start.x, hit.point.x);
-        hit.normal = UP;
-        return hit;
+        ray.pos = vec2(ray.pos.x, cell.end.y);
+        ray.u = calc_u(cell.end.x, cell.start.x, ray.pos.x);
+        ray.normal = UP;
+        return ray;
     }
 
     if (ray.dir.x == -1.0) {
-        hit.point = vec2(cell.start.x, ray.pos.y);
-        hit.u = calc_u(cell.end.y, cell.start.y, hit.point.y);
-        hit.normal = RIGHT;
-        return hit;
+        ray.pos = vec2(cell.start.x, ray.pos.y);
+        ray.u = calc_u(cell.end.y, cell.start.y, ray.pos.y);
+        ray.normal = RIGHT;
+        return ray;
     }
 
     if (ray.dir.x == 1.0) {
-        hit.point = vec2(cell.end.x, ray.pos.y);
-        hit.u = calc_u(cell.start.y, cell.end.y, hit.point.y);
-        hit.normal = LEFT;
-        return hit;
+        ray.pos = vec2(cell.end.x, ray.pos.y);
+        ray.u = calc_u(cell.start.y, cell.end.y, ray.pos.y);
+        ray.normal = LEFT;
+        return ray;
     }
 
     float slope = ray.dir.y / ray.dir.x;
 
     if (ray.dir.y < 0) {
-        hit.point = intersect_horizontal_line(cell.start.y, slope, ray.pos);
-        hit.u = calc_u(cell.start.x, cell.end.x, hit.point.x);
-        hit.normal = DOWN;
+        ray.pos = intersect_horizontal_line(cell.start.y, slope, ray.pos);
+        ray.u = calc_u(cell.start.x, cell.end.x, ray.pos.x);
+        ray.normal = DOWN;
     }
     else {
-        hit.point = intersect_horizontal_line(cell.end.y, slope, ray.pos);
-        hit.u = calc_u(cell.end.x, cell.start.x, hit.point.x);
-        hit.normal = UP;
+        ray.pos = intersect_horizontal_line(cell.end.y, slope, ray.pos);
+        ray.u = calc_u(cell.end.x, cell.start.x, ray.pos.x);
+        ray.normal = UP;
     }
 
-    if (hit.point.x < cell.start.x) {
-        hit.point = intersect_vertical_line(cell.start.x, slope, ray.pos);
-        hit.u = calc_u(cell.end.y, cell.start.y, hit.point.y);
-        hit.normal = RIGHT;
+    if (ray.pos.x < cell.start.x) {
+        ray.pos = intersect_vertical_line(cell.start.x, slope, ray.pos);
+        ray.u = calc_u(cell.end.y, cell.start.y, ray.pos.y);
+        ray.normal = RIGHT;
     }
-    else if (hit.point.x > cell.end.x) {
-        hit.point = intersect_vertical_line(cell.end.x, slope, ray.pos);
-        hit.u = calc_u(cell.start.y, cell.end.y, hit.point.y);
-        hit.normal = LEFT;
+    else if (ray.pos.x > cell.end.x) {
+        ray.pos = intersect_vertical_line(cell.end.x, slope, ray.pos);
+        ray.u = calc_u(cell.start.y, cell.end.y, ray.pos.y);
+        ray.normal = LEFT;
     }
 
-    return hit;
+    return ray;
 }
 
 Tile get_tile(vec2 point) {
@@ -164,47 +159,45 @@ Tile get_tile(vec2 point) {
     return tilemap.tiles[index - tilemap_index_offset];
 }
 
-Ray calc_next_ray(Ray ray, RayHit hit, Tile tile) {
+Ray warp_ray(Ray ray, Tile tile) {
     if (tile.warp_offset == vec2(0.0, 0.0)) {
-        ray.pos = hit.point;
         return ray;
     }
 
-    vec2 origin = floor_vec(hit.point) + vec2(0.5, 0.5);
+    vec2 origin = floor_vec(ray.pos) + vec2(0.5, 0.5);
     mat2 rot = rotation(tile.warp_angle);
 
-    ray.pos = (hit.point - hit.normal - origin) * rot + origin + tile.warp_offset;
+    ray.pos = (ray.pos - ray.normal - origin) * rot + origin + tile.warp_offset;
     ray.dir *= rot;
 
     return ray;
 }
 
-RayHit raycast(float angle) {
+Ray raycast(float angle) {
     Ray ray;
     ray.pos = camera_data.origin;
     ray.dir = rotation(angle - camera_data.rotation) * vec2(0.0, -1.0);
-
-    float dist = 0.0;
+    ray.dist = 0.0;
 
     while (true) {
-        RayHit hit = calc_intersection(ray);
+        vec2 prev_pos = ray.pos;
+        ray = calc_intersection(ray);
 
-        dist += length(hit.point - ray.pos) * cos(angle);
-        hit.dist = dist;
+        ray.dist += length(ray.pos - prev_pos) * cos(angle);
 
-        if (hit.dist > camera_data.far_plane) {
-            hit.dist = camera_data.far_plane;
-            return hit;
+        if (ray.dist > camera_data.far_plane) {
+            ray.dist = camera_data.far_plane;
+            return ray;
         }
 
-        Tile tile = get_tile(hit.point);
+        Tile tile = get_tile(ray.pos);
 
-        hit.texture_index = tile.texture_index;
-        if (hit.texture_index >= 0) {
-            return hit;
+        ray.texture_index = tile.texture_index;
+        if (ray.texture_index >= 0) {
+            return ray;
         }
 
-        ray = calc_next_ray(ray, hit, tile);
+        ray = warp_ray(ray, tile);
     }
 }
 
@@ -213,9 +206,8 @@ void main() {
     tilemap_index_offset = tilemap.dim.start.y * tilemap_num_cols + tilemap.dim.start.x;
 
     float x = lerp(tan(camera_data.fov), tan(-camera_data.fov), gl_GlobalInvocationID.x / float(gl_NumWorkGroups * 64));
-    RayHit ray = raycast(atan(x));
+    Ray ray = raycast(atan(x));
 
     imageStore(output_data, ivec2(gl_GlobalInvocationID.x, 0), vec4(ray.dist, ray.u, ray.texture_index, 0.0));
-    imageStore(output_data, ivec2(gl_GlobalInvocationID.x, 1), vec4(ray.point, 0.0, 0.0));
-    imageStore(output_data, ivec2(gl_GlobalInvocationID.x, 2), vec4(ray.normal, 0.0, 0.0));
+    imageStore(output_data, ivec2(gl_GlobalInvocationID.x, 1), vec4(ray.normal, ray.dir));
 }

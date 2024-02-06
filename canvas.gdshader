@@ -25,8 +25,8 @@ struct Wall {
 	float dist;
 	float texture_index;
 	vec2 uv;
-	vec2 position;
-	vec3 normal;
+	vec2 view_dir;
+	vec2 normal;
 };
 
 //===================
@@ -74,16 +74,16 @@ vec4 draw_floor(vec2 uv) {
 
 vec4 draw_wall(Wall wall) {
 	vec2 uv = wall.uv;
-	vec3 normal = wall.normal;
-	mat3 tbn = mat3(cross(wall.normal, BITANGENT), BITANGENT, normal);
+	vec3 normal = vec3(wall.normal, 0.0);
+	mat3 tbn = mat3(cross(normal, BITANGENT), BITANGENT, normal);
 	
 	if (use_parallax_mapping) {
-		vec3 dir = normalize((vec3(origin, 0.5) - vec3(wall.position, uv.y))) * tbn;
+		vec3 dir = normalize(vec3(0.0, 0.0, 0.5) - vec3(wall.view_dir, uv.y)) * tbn;
 		uv = apply_parallax(uv, dir);
 	}
 	
 	vec4 colour = texture(wall_textures, vec3(uv, wall.texture_index));
-	vec3 light_dir = normalize(vec3(wall.normal.xy, -1.0)) * tbn;
+	vec3 light_dir = normalize(vec3(wall.normal, -1.0)) * tbn;
 	
 	if (use_normal_mapping) {
 		normal = sample_normal_vector(uv);
@@ -119,8 +119,10 @@ vec4 calc_colour(vec2 uv) {
 	
 	wall.uv = vec2(data.g, v);
 	wall.texture_index = data.b + 2.0;
-	wall.position = texture(data_texture, vec2(uv.x, 0.5)).rg;
-	wall.normal = texture(data_texture, vec2(uv.x, 1.0)).rgb;
+	
+	data = texture(data_texture, vec2(uv.x, 1.0));
+	wall.normal = data.rg;
+	wall.view_dir = data.ba;
 	
 	return draw_wall(wall);
 }
