@@ -127,12 +127,14 @@ func _handle_movement(delta : float):
 	else:
 		velocity += diff.normalized() * a
 	
-	var traveled := velocity / Constants.TILEMAP_CELL_SIZE * delta
+	_handle_warp(delta)
+	
+	var prev_pos := position
+	move_and_slide()
+	
+	var traveled := (position - prev_pos) / Constants.TILEMAP_CELL_SIZE
 	tiles_traveled += traveled.length()
 	virtual_pos += traveled.rotated(-physical_dir.x)
-	
-	_handle_warp(delta)
-	move_and_slide()
 
 
 func _target_velocity() -> Vector2:
