@@ -3,7 +3,6 @@ class_name Maze
 
 var warp_fields := {}
 
-
 class Tile extends Resource:
 	var texture_index : int
 	var warp_offset := Vector2()

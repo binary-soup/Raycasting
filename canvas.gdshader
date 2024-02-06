@@ -3,8 +3,7 @@ shader_type canvas_item;
 uniform sampler2D data_texture : filter_nearest;
 
 uniform vec2 view_pos;
-uniform float pitch;
-uniform float rotation;
+uniform vec2 view_dir;
 uniform float depth_scale = 0.1;
 
 uniform float far_plane;
@@ -44,9 +43,9 @@ mat2 rotate(float rad) {
 
 //===================
 
-vec2 apply_parallax(vec2 uv, vec3 view_dir) {
+vec2 apply_parallax(vec2 uv, vec3 dir) {
 	float depth = texture(wall_textures, vec3(uv, 1)).r;
-	return uv - view_dir.xy / view_dir.z * depth * depth_scale;
+	return uv - dir.xy / dir.z * depth * depth_scale;
 }
 
 vec3 sample_normal_vector(vec2 uv) {
@@ -59,17 +58,17 @@ vec4 sample_fog(float dist) {
 
 vec4 draw_ceiling(vec2 uv) {
 	vec2 nuv = (2.0 * uv - vec2(1.0));
-	vec2 st = vec2(1.0, 0.0) * rotate(rotation);
+	vec2 st = vec2(1.0, 0.0) * rotate(view_dir.x);
 	
 	vec3 xyz = vec3(st.s + st.t*nuv.x, -st.t + st.s*nuv.x, -nuv.y);
 	return texture(skybox, xyz);
 }
 
 vec4 draw_floor(vec2 uv) {
-	float dist = (0.5 / (uv.y - 0.5 + tan(pitch)));
+	float dist = (0.5 / (uv.y - 0.5 + tan(view_dir.y)));
 	float nu = 2.0 * uv.x - 1.0;
 	
-	uv = vec2(nu * dist, dist) * rotate(rotation) + vec2(1.0, -1.0) * view_pos;
+	uv = vec2(nu * dist, dist) * rotate(view_dir.x) + vec2(1.0, -1.0) * view_pos;
 	return texture(floor_texture, uv) + sample_fog(dist);
 }
 
@@ -79,8 +78,8 @@ vec4 draw_wall(Wall wall) {
 	mat3 tbn = mat3(cross(wall.normal, BITANGENT), BITANGENT, normal);
 	
 	if (use_parallax_mapping) {
-		vec3 view_dir = normalize((vec3(view_pos, 0.5) - vec3(wall.position, uv.y))) * tbn;
-		uv = apply_parallax(uv, view_dir);
+		vec3 dir = normalize((vec3(view_pos, 0.5) - vec3(wall.position, uv.y))) * tbn;
+		uv = apply_parallax(uv, dir);
 	}
 	
 	vec4 colour = texture(wall_textures, vec3(uv, wall.texture_index));
@@ -103,7 +102,7 @@ vec4 calc_colour(vec2 uv) {
 	Wall wall;
 	wall.dist = data.r;
 	
-	float offset = 0.5 + wall.dist * tan(pitch);
+	float offset = 0.5 + wall.dist * tan(view_dir.y);
 	float v = wall.dist * uv.y - wall.dist * 0.5 + offset;
 	
 	if (v < 0.0) {

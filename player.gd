@@ -9,7 +9,8 @@ signal physics_changed
 var prev_view_angle : Vector2
 var prev_step_dir := 1.0
 
-var view_dir := Vector2()
+var virtual_dir := Vector2()
+var physical_dir := Vector2()
 
 var tiles_traveled := 0.0
 var step_sounds : Bag
@@ -42,7 +43,7 @@ var step_sounds : Bag
 		view_cone.scale = Vector2(tan(fov) * val / (cone_size.x / 2), val / cone_size.y) * Constants.TILEMAP_CELL_SIZE
 
 var pitch := 0.0
-var view_angle := Vector2():
+var view_angle : Vector2 :
 	get:
 		return Vector2(rotation, pitch)
 	set(val):
@@ -86,14 +87,14 @@ func _handle_view(delta : float):
 	var extents := PI/2
 	if clamp_pitch: extents = pitch_clamp
 	
-	view_dir += Main.MOUSE_MOTION * mouse_sensitivity * delta
-	view_dir.y = clamp(view_dir.y, -extents, extents)
+	virtual_dir += Main.MOUSE_MOTION * mouse_sensitivity * delta
+	virtual_dir.y = clamp(virtual_dir.y, -extents, extents)
 	
 	var view_bob := Vector2()
 	if use_view_bobbing:
 		view_bob = Vector2(0.0, sin(tiles_traveled * step_factor)) * view_bob_fov
 	
-	view_angle = view_bob + view_dir
+	view_angle = physical_dir + virtual_dir + view_bob
 
 
 func _handle_step_sounds():
@@ -141,7 +142,7 @@ func _target_velocity() -> Vector2:
 		target.x += 1
 	target.x *= strafe_speed
 	
-	return (target * Constants.TILEMAP_CELL_SIZE).rotated(view_dir.x)
+	return (target * Constants.TILEMAP_CELL_SIZE).rotated(physical_dir.x + virtual_dir.x)
 
 
 func _choose_speed() -> float:
@@ -157,7 +158,7 @@ func _handle_warp(delta : float):
 		return
 	
 	position = (position + warp.dir * Constants.TILEMAP_CELL_SIZE - warp.position).rotated(warp.angle) + warp.position + warp.offset
-	view_dir.x += warp.angle
+	physical_dir.x += warp.angle
 	velocity = velocity.rotated(warp.angle)
 
 
