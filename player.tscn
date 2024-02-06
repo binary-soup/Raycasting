@@ -6,6 +6,7 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_bgty5"]
 
 [node name="Player" type="CharacterBody2D" groups=["DebugOptions"]]
+z_index = 1
 motion_mode = 1
 script = ExtResource("1_xcrt6")
 

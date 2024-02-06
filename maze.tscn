@@ -21,39 +21,47 @@ script = ExtResource("2_4gupg")
 z_index = 1
 
 [node name="WarpField1" parent="Warps" instance=ExtResource("3_u10lr")]
+modulate = Color(0.85098, 0, 0, 1)
 position = Vector2(-144, -208)
 target_path = NodePath("../WarpField2")
 
 [node name="WarpField2" parent="Warps" instance=ExtResource("3_u10lr")]
+modulate = Color(0.85098, 0, 0, 1)
 position = Vector2(-144, 208)
 rotation = 3.14159
 target_path = NodePath("../WarpField1")
 
 [node name="WarpField3" parent="Warps" instance=ExtResource("3_u10lr")]
+modulate = Color(0.85098, 0.780392, 0, 1)
 position = Vector2(144, -208)
 target_path = NodePath("../WarpField4")
 
 [node name="WarpField4" parent="Warps" instance=ExtResource("3_u10lr")]
+modulate = Color(0.85098, 0.780392, 0, 1)
 position = Vector2(144, 208)
 rotation = 3.14159
 target_path = NodePath("../WarpField3")
 
 [node name="WarpField5" parent="Warps" instance=ExtResource("3_u10lr")]
+modulate = Color(0, 0.85098, 0.141176, 1)
 position = Vector2(-208, -144)
 rotation = -1.5708
 target_path = NodePath("../WarpField6")
 
 [node name="WarpField6" parent="Warps" instance=ExtResource("3_u10lr")]
+modulate = Color(0, 0.85098, 0.141176, 1)
 position = Vector2(208, -144)
 rotation = 1.5708
 target_path = NodePath("../WarpField5")
 
 [node name="WarpField7" parent="Warps" instance=ExtResource("3_u10lr")]
+modulate = Color(0, 0, 0.85098, 1)
 position = Vector2(-208, 144)
 rotation = 4.71239
 target_path = NodePath("../WarpField8")
 
 [node name="WarpField8" parent="Warps" instance=ExtResource("3_u10lr")]
+modulate = Color(0, 0, 0.85098, 1)
 position = Vector2(208, 144)
 rotation = 1.5708
 target_path = NodePath("../WarpField7")
