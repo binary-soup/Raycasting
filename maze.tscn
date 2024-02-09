@@ -1,9 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://co5hhkcwleao7"]
+[gd_scene load_steps=4 format=3 uid="uid://co5hhkcwleao7"]
 
 [ext_resource type="TileSet" uid="uid://ij6ensf36lys" path="res://assets/tileset.tres" id="1_l1fop"]
 [ext_resource type="Script" path="res://maze.gd" id="2_4gupg"]
 [ext_resource type="PackedScene" uid="uid://bwbpgqsxmu1rl" path="res://field_warp.tscn" id="3_u10lr"]
-[ext_resource type="PackedScene" uid="uid://bmldwfwo7k2am" path="res://corner_warp.tscn" id="4_07lyv"]
 
 [node name="Maze" type="TileMap"]
 texture_filter = 1
@@ -66,18 +65,3 @@ modulate = Color(0, 0, 0.85098, 1)
 position = Vector2(208, 144)
 rotation = 1.5708
 target_path = NodePath("../WarpField7")
-
-[node name="CornerWarp1" parent="Warps" instance=ExtResource("4_07lyv")]
-position = Vector2(-80, -80)
-
-[node name="CornerWarp2" parent="Warps" instance=ExtResource("4_07lyv")]
-position = Vector2(80, -80)
-rotation = 1.5708
-
-[node name="CornerWarp3" parent="Warps" instance=ExtResource("4_07lyv")]
-position = Vector2(80, 80)
-rotation = 3.14159
-
-[node name="CornerWarp4" parent="Warps" instance=ExtResource("4_07lyv")]
-position = Vector2(-80, 80)
-rotation = 4.71239

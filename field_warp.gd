@@ -6,9 +6,9 @@ class_name FieldWarp
 
 
 func _ready():
-	offset = target.position - position
+	offset = (target.position - position) / Constants.TILEMAP_CELL_SIZE
 	
 	var normal := Vector2.DOWN.rotated(rotation)
 	var target_normal := Vector2.DOWN.rotated(target.rotation)
 	
-	angle = (rotation - target.rotation + PI * normal.dot(target_normal)) / (normal.y - normal.x)
+	angle = (rotation - target.rotation + PI * normal.dot(target_normal))

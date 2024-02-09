@@ -33,7 +33,7 @@ func _init_shader_parameters():
 
 func _init_compute():
 	rd = RenderingServer.create_local_rendering_device()
-	uniforms = [RDUniform.new(), RDUniform.new(), RDUniform.new()]
+	uniforms = [RDUniform.new(), RDUniform.new(), RDUniform.new(), RDUniform.new()]
 	
 	# init shader and pipeline
 	var spirv := preload("res://raycasting.glsl").get_spirv()
@@ -42,6 +42,7 @@ func _init_compute():
 	
 	# create data uniforms that don't change
 	_build_tilemap_uniform()
+	_build_warps_uniform()
 
 
 func _on_resized():
@@ -103,6 +104,15 @@ func _build_tilemap_uniform():
 	_build_storage_buffer_uniform(data, 2)
 
 
+func _build_warps_uniform():
+	var data : PackedByteArray = []
+	
+	for warp in maze.build_warps_array():
+		data.append_array(_warp_to_byte_array(warp))
+	
+	_build_storage_buffer_uniform(data, 3)
+
+
 func _build_storage_buffer_uniform(bytes : PackedByteArray, binding : int):
 	var uniform := RDUniform.new()
 	uniform.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
@@ -117,17 +127,15 @@ func _rect2i_to_byte_array(rect : Rect2i) -> PackedByteArray:
 
 
 func _tile_to_byte_array(tile : Maze.Tile) -> PackedByteArray:
-	var data : PackedByteArray = []
-	
-	data.append_array(PackedInt32Array([
-		tile.texture_index
-	]).to_byte_array())
-	
-	data.append_array(PackedFloat32Array([
-		tile.warp_angle, tile.warp_offset.x, tile.warp_offset.y
-	]).to_byte_array())
-	
-	return data
+	return PackedInt32Array([
+		tile.texture_index, tile.warp_index
+	]).to_byte_array()
+
+
+func _warp_to_byte_array(warp : Warp) -> PackedByteArray:
+	return PackedFloat32Array([
+		warp.offset.x, warp.offset.y, warp.angle, 0.0
+	]).to_byte_array()
 
 
 func _calculate_frame():

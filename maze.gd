@@ -5,8 +5,7 @@ var warp_fields := {}
 
 class Tile extends Resource:
 	var texture_index : int
-	var warp_offset := Vector2()
-	var warp_angle := 0.0
+	var warp_index := -1
 	
 	func _init(index : int):
 		texture_index = index
@@ -24,6 +23,15 @@ func build_tiles_array() -> Array[Tile]:
 	return tiles
 
 
+func build_warps_array() -> Array[Warp]:
+	var warps : Array[Warp] = []
+	
+	for key in warp_fields.keys():
+		warps.append(warp_fields[key])
+	
+	return warps
+
+
 func get_warp(pos : Vector2) -> Warp:
 	var coords := Vector2i((pos / Constants.TILEMAP_CELL_SIZE).floor())
 	
@@ -35,7 +43,8 @@ func get_warp(pos : Vector2) -> Warp:
 
 func _ready():
 	for warp in $Warps.get_children():
-		warp_fields[warp.get_coords()] = warp
+		var coords : Vector2i = warp.get_coords()
+		warp_fields[coords] = warp
 
 
 func _fill_tiles(tiles : Array[Tile], bounds : Rect2i):
@@ -51,9 +60,10 @@ func _new_tile(coords : Vector2i) -> Tile:
 
 
 func _set_warps(tiles : Array[Tile], cols : int, index_offset : int):
+	var i := 0
+	
 	for key in warp_fields.keys():
 		var index : int = key.y * cols + key.x - index_offset
-		var warp : Warp = warp_fields[key]
 		
-		tiles[index].warp_offset = warp.offset / Constants.TILEMAP_CELL_SIZE
-		tiles[index].warp_angle = warp.angle
+		tiles[index].warp_index = i
+		i += 1

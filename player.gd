@@ -170,7 +170,7 @@ func _handle_warp(pos : Vector2):
 	var normal := warp.calc_normal(pos)
 	var angle := (normal.y - normal.x) * warp.angle
 	
-	position = (position - normal * Constants.TILEMAP_CELL_SIZE - warp.position).rotated(angle) + warp.position + warp.offset
+	position = (position - normal * Constants.TILEMAP_CELL_SIZE - warp.position).rotated(angle) + warp.position + warp.offset * Constants.TILEMAP_CELL_SIZE
 	physical_dir.x += angle
 	velocity = velocity.rotated(angle)
 
