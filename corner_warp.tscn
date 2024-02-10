@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3 uid="uid://dsr1krydjessl"]
+
+[ext_resource type="Script" path="res://multi_warp.gd" id="1_r887n"]
+[ext_resource type="PackedScene" uid="uid://bwbpgqsxmu1rl" path="res://warp.tscn" id="1_twkbs"]
+
+[node name="CornerWarp" type="Node2D"]
+script = ExtResource("1_r887n")
+
+[node name="Warp1" parent="." instance=ExtResource("1_twkbs")]
+target_path = NodePath("../Warp2")
+
+[node name="Warp2" parent="." instance=ExtResource("1_twkbs")]
+rotation = 1.5708
+target_path = NodePath("../Warp1")

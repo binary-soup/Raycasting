@@ -51,13 +51,14 @@ func get_warp(pos : Vector2, dir : Vector2) -> Warp:
 
 
 func _ready():
-	for warp in $Warps.get_children():
-		var coords : Vector2i = warp.get_coords()
-		
-		if coords in warp_fields:
-			warp_fields[coords].append(warp)
-		else:
-			warp_fields[coords] = [warp]
+	for node in $Warps.get_children():
+		for warp in node.get_warps():
+			var coords : Vector2i = warp.get_coords()
+			
+			if coords in warp_fields:
+				warp_fields[coords].append(warp)
+			else:
+				warp_fields[coords] = [warp]
 
 
 func _fill_tiles(tiles : Array[Tile], bounds : Rect2i):
