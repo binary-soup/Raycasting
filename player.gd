@@ -3,8 +3,7 @@ class_name Player
 
 signal physics_changed
 
-@export_node_path("Maze") var maze_path
-@onready var maze : Maze = get_node(maze_path)
+@onready var maze : Maze = get_parent()
 
 var prev_view_angle : Vector2
 var prev_step_dir := 1.0

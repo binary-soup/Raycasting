@@ -1,11 +1,10 @@
-[gd_scene load_steps=7 format=3 uid="uid://dx5hiwbogp1s8"]
+[gd_scene load_steps=6 format=3 uid="uid://dx5hiwbogp1s8"]
 
 [ext_resource type="Script" path="res://game.gd" id="1_7cuca"]
 [ext_resource type="PackedScene" uid="uid://5005s1jul1gw" path="res://canvas.tscn" id="2_cqsjv"]
 [ext_resource type="Script" path="res://FPSLabel.gd" id="3_2xmlg"]
 [ext_resource type="PackedScene" uid="uid://7ywfiypg3v2t" path="res://pause_menu.tscn" id="4_maopv"]
 [ext_resource type="PackedScene" uid="uid://co5hhkcwleao7" path="res://maze.tscn" id="5_hboot"]
-[ext_resource type="PackedScene" uid="uid://cvq8bpxksvjic" path="res://player.tscn" id="6_rkwaj"]
 
 [node name="Game" type="Control" groups=["AlwaysProcess"]]
 layout_mode = 3
@@ -38,9 +37,6 @@ color = Color(0, 0, 0, 0.588235)
 
 [node name="Maze" parent="MiniMap/Game" instance=ExtResource("5_hboot")]
 
-[node name="Player" parent="MiniMap/Game" instance=ExtResource("6_rkwaj")]
-maze_path = NodePath("../Maze")
-
 [node name="FPSLabel" type="Label" parent="."]
 top_level = true
 layout_mode = 0
@@ -53,7 +49,6 @@ script = ExtResource("3_2xmlg")
 z_index = -1
 layout_mode = 1
 expand_mode = 1
-player_path = NodePath("../MiniMap/Game/Player")
 maze_path = NodePath("../MiniMap/Game/Maze")
 
 [node name="PauseMenu" parent="." instance=ExtResource("4_maopv")]

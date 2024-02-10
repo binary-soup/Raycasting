@@ -1,11 +1,10 @@
 extends TextureRect
 class_name Canvas
 
-@export_node_path("Player") var player_path
-@onready var player : Player = get_node(player_path)
-
 @export_node_path("Maze") var maze_path
 @onready var maze : Maze = get_node(maze_path)
+@onready var player : Player = maze.get_node("Player")
+
 
 var rd : RenderingDevice
 var shader : RID
