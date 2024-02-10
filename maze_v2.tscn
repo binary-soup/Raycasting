@@ -7,6 +7,7 @@
 
 [node name="Crossroads" type="TileMap"]
 texture_filter = 1
+position = Vector2(-16, -16)
 tile_set = ExtResource("1_watby")
 format = 2
 layer_0/name = "Floor"
