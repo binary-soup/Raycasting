@@ -2,7 +2,7 @@
 
 [ext_resource type="TileSet" uid="uid://ij6ensf36lys" path="res://assets/tileset.tres" id="1_l1fop"]
 [ext_resource type="Script" path="res://maze.gd" id="2_4gupg"]
-[ext_resource type="PackedScene" uid="uid://bwbpgqsxmu1rl" path="res://field_warp.tscn" id="3_u10lr"]
+[ext_resource type="PackedScene" uid="uid://bwbpgqsxmu1rl" path="res://warp.tscn" id="3_u10lr"]
 
 [node name="Maze" type="TileMap"]
 texture_filter = 1
@@ -65,3 +65,41 @@ modulate = Color(0, 0, 0.85098, 1)
 position = Vector2(208, 144)
 rotation = 1.5708
 target_path = NodePath("../WarpField7")
+
+[node name="WarpField9" parent="Warps" instance=ExtResource("3_u10lr")]
+position = Vector2(-80, -80)
+target_path = NodePath("../WarpField10")
+
+[node name="WarpField10" parent="Warps" instance=ExtResource("3_u10lr")]
+position = Vector2(-80, -80)
+rotation = -1.5708
+target_path = NodePath("../WarpField9")
+
+[node name="WarpField11" parent="Warps" instance=ExtResource("3_u10lr")]
+position = Vector2(80, -80)
+target_path = NodePath("../WarpField12")
+
+[node name="WarpField12" parent="Warps" instance=ExtResource("3_u10lr")]
+position = Vector2(80, -80)
+rotation = 1.5708
+target_path = NodePath("../WarpField11")
+
+[node name="WarpField13" parent="Warps" instance=ExtResource("3_u10lr")]
+position = Vector2(80, 80)
+rotation = 3.14159
+target_path = NodePath("../WarpField14")
+
+[node name="WarpField14" parent="Warps" instance=ExtResource("3_u10lr")]
+position = Vector2(80, 80)
+rotation = 1.5708
+target_path = NodePath("../WarpField13")
+
+[node name="WarpField15" parent="Warps" instance=ExtResource("3_u10lr")]
+position = Vector2(-80, 80)
+rotation = 3.14159
+target_path = NodePath("../WarpField16")
+
+[node name="WarpField16" parent="Warps" instance=ExtResource("3_u10lr")]
+position = Vector2(-80, 80)
+rotation = -1.5708
+target_path = NodePath("../WarpField15")

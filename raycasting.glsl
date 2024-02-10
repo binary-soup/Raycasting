@@ -17,6 +17,8 @@ camera_data;
 struct Tile {
     int texture_index;
     int warp_index;
+    int num_warps;
+    int pad;
 };
 
 struct Rect2i {
@@ -31,9 +33,10 @@ layout(set = 0, binding = 2, std430) restrict buffer Tilemap {
 tilemap;
 
 struct Warp {
+    vec2 dir;
     vec2 offset;
+    vec3 pad;
     float angle;
-    float pad;
 };
 
 layout(set = 0, binding = 3, std430) restrict buffer Warps {
@@ -169,16 +172,29 @@ Tile get_tile(vec2 point) {
     return tilemap.tiles[index - tilemap_index_offset];
 }
 
+Warp find_warp(int start, int count, vec2 normal) {
+    Warp warp = warps.data[start];
+
+    for (int i = 1; i < count; i++) {
+        if (dot(warps.data[start + i].dir, normal) < -0.01) {
+            return warps.data[start + i];
+        }
+    }
+
+    return warp;
+}
+
 Ray warp_ray(Ray ray, Tile tile) {
     if (tile.warp_index < 0) {
         return ray;
     }
-    Warp warp = warps.data[tile.warp_index];
+
+    Warp warp = find_warp(tile.warp_index, tile.num_warps, ray.normal);
 
     vec2 origin = floor_vec(ray.pos) + vec2(0.5, 0.5);
     mat2 rot = rotation(warp.angle);
 
-    ray.pos = (ray.pos - ray.normal - origin) * rot + origin + warp.offset;
+    ray.pos = (ray.pos + warp.dir - origin) * rot + origin + warp.offset;
     ray.dir *= rot;
 
     return ray;

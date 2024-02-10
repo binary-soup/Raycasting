@@ -6,6 +6,7 @@ var warp_fields := {}
 class Tile extends Resource:
 	var texture_index : int
 	var warp_index := -1
+	var num_warps := 0
 	
 	func _init(index : int):
 		texture_index = index
@@ -26,25 +27,37 @@ func build_tiles_array() -> Array[Tile]:
 func build_warps_array() -> Array[Warp]:
 	var warps : Array[Warp] = []
 	
-	for key in warp_fields.keys():
-		warps.append(warp_fields[key])
+	for coords in warp_fields.keys():
+		for warp in warp_fields[coords]:
+			warps.append(warp)
 	
 	return warps
 
 
-func get_warp(pos : Vector2) -> Warp:
-	var coords := Vector2i((pos / Constants.TILEMAP_CELL_SIZE).floor())
-	
-	if coords in warp_fields:
-		return warp_fields[coords]
+func get_warp(pos : Vector2, dir : Vector2) -> Warp:
+	var coords := Vector2i(pos.floor())
+	if not coords in warp_fields:
+		return null
 		
-	return null
+	var warps : Array = warp_fields[coords]
+	var warp : Warp = warps[0]
+	var edge := _calc_enter_egde(coords, pos, dir)
+	
+	for i in range(1, warps.size()):
+		if edge.dot(warps[i].dir) < -0.01:
+			return warps[i]
+	
+	return warp
 
 
 func _ready():
 	for warp in $Warps.get_children():
 		var coords : Vector2i = warp.get_coords()
-		warp_fields[coords] = warp
+		
+		if coords in warp_fields:
+			warp_fields[coords].append(warp)
+		else:
+			warp_fields[coords] = [warp]
 
 
 func _fill_tiles(tiles : Array[Tile], bounds : Rect2i):
@@ -62,8 +75,45 @@ func _new_tile(coords : Vector2i) -> Tile:
 func _set_warps(tiles : Array[Tile], cols : int, index_offset : int):
 	var i := 0
 	
-	for key in warp_fields.keys():
-		var index : int = key.y * cols + key.x - index_offset
+	for coords in warp_fields.keys():
+		var index : int = coords.y * cols + coords.x - index_offset
+		var count : int = warp_fields[coords].size()
 		
 		tiles[index].warp_index = i
-		i += 1
+		tiles[index].num_warps = count
+		i += count
+
+
+func _calc_enter_egde(cell : Vector2, pos : Vector2, dir : Vector2) -> Vector2:
+	if dir.y == -1.0:
+		return Vector2.UP
+	if dir.y == 1.0:
+		return Vector2.DOWN
+	if dir.x == -1.0:
+		return Vector2.LEFT
+	if dir.x == 1.0:
+		return Vector2.RIGHT
+	
+	var slope := dir.y / dir.x
+	
+	var point : float
+	var normal : Vector2
+	
+	if dir.y < 0.0:
+		point = _intersect_edge(cell.y, slope, pos)
+		normal = Vector2.UP
+	else:
+		point = _intersect_edge(cell.y + 1.0, slope, pos)
+		normal = Vector2.DOWN
+	
+	if point < cell.x:
+		return Vector2.LEFT
+	elif point > cell.x + 1.0:
+		return Vector2.RIGHT
+	
+	return normal
+
+
+func _intersect_edge(y : float, slope : float, pos : Vector2) -> float:
+	var initial := -slope * pos.x + pos.y;
+	return (y - initial) / slope

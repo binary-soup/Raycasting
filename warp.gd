@@ -1,8 +1,20 @@
 extends Node2D
 class_name Warp
 
-var offset := Vector2()
-var angle := 0.0
+@export_node_path("Warp") var target_path
+@onready var target : Warp = get_node(target_path)
+
+var dir : Vector2
+var offset : Vector2
+var angle : float
+
+
+func _ready():
+	dir = Vector2.UP.rotated(rotation)
+	var target_dir := Vector2.UP.rotated(target.rotation)
+	
+	offset = (target.position - position) / Constants.TILEMAP_CELL_SIZE
+	angle = (rotation - target.rotation + PI * dir.dot(target_dir))
 
 
 func get_coords() -> Vector2i:

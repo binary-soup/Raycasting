@@ -128,13 +128,13 @@ func _rect2i_to_byte_array(rect : Rect2i) -> PackedByteArray:
 
 func _tile_to_byte_array(tile : Maze.Tile) -> PackedByteArray:
 	return PackedInt32Array([
-		tile.texture_index, tile.warp_index
+		tile.texture_index, tile.warp_index, tile.num_warps, 0
 	]).to_byte_array()
 
 
 func _warp_to_byte_array(warp : Warp) -> PackedByteArray:
 	return PackedFloat32Array([
-		warp.offset.x, warp.offset.y, warp.angle, 0.0
+		warp.dir.x, warp.dir.y, warp.offset.x, warp.offset.y, 0.0, 0.0, 0.0, warp.angle
 	]).to_byte_array()
 
 

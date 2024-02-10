@@ -127,7 +127,7 @@ func _handle_movement(delta : float):
 	else:
 		velocity += diff.normalized() * a
 	
-	_handle_warp(position + velocity * delta)
+	_handle_warp(position, position + velocity * delta)
 	
 	var prev_pos := position
 	move_and_slide()
@@ -162,17 +162,14 @@ func _choose_speed() -> float:
 		return walk_speed
 
 
-func _handle_warp(pos : Vector2):
-	var warp := maze.get_warp(pos)
+func _handle_warp(start : Vector2, target : Vector2):
+	var warp := maze.get_warp(target / Constants.TILEMAP_CELL_SIZE, (start - target).normalized())
 	if warp == null:
 		return
 	
-	var normal := warp.calc_normal(pos)
-	var angle := (normal.y - normal.x) * warp.angle
-	
-	position = (position - normal * Constants.TILEMAP_CELL_SIZE - warp.position).rotated(angle) + warp.position + warp.offset * Constants.TILEMAP_CELL_SIZE
-	physical_dir.x += angle
-	velocity = velocity.rotated(angle)
+	position = (position + warp.dir * Constants.TILEMAP_CELL_SIZE - warp.position).rotated(warp.angle) + warp.position + warp.offset * Constants.TILEMAP_CELL_SIZE
+	physical_dir.x += warp.angle
+	velocity = velocity.rotated(warp.angle)
 
 
 # DebugOptions group
