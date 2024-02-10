@@ -3,7 +3,7 @@
 [ext_resource type="TileSet" uid="uid://ij6ensf36lys" path="res://assets/tileset.tres" id="1_watby"]
 [ext_resource type="Script" path="res://maze.gd" id="2_f0tm4"]
 [ext_resource type="PackedScene" uid="uid://cvq8bpxksvjic" path="res://player.tscn" id="3_1eurb"]
-[ext_resource type="PackedScene" uid="uid://bwbpgqsxmu1rl" path="res://warp.tscn" id="4_e3sgi"]
+[ext_resource type="PackedScene" uid="uid://ckrib0710xj7n" path="res://tunnel_warp.tscn" id="4_qjd5y"]
 
 [node name="Crossroads" type="TileMap"]
 texture_filter = 1
@@ -24,23 +24,10 @@ position = Vector2(16, 80)
 [node name="Warps" type="Node2D" parent="."]
 z_index = 1
 
-[node name="Warp1" parent="Warps" instance=ExtResource("4_e3sgi")]
-position = Vector2(16, 16)
-target_path = NodePath("../Warp2")
-
-[node name="Warp2" parent="Warps" instance=ExtResource("4_e3sgi")]
-position = Vector2(16, 16)
-rotation = 3.14159
-target_path = NodePath("../Warp1")
-
-[node name="Warp3" parent="Warps" instance=ExtResource("4_e3sgi")]
-modulate = Color(0.0627451, 0.0627451, 0.0627451, 1)
-position = Vector2(16, 16)
-rotation = 1.5708
-target_path = NodePath("../Warp4")
-
-[node name="Warp4" parent="Warps" instance=ExtResource("4_e3sgi")]
+[node name="TunnelWarp" parent="Warps" instance=ExtResource("4_qjd5y")]
 modulate = Color(0, 0, 0, 1)
 position = Vector2(16, 16)
-rotation = -1.5708
-target_path = NodePath("../Warp3")
+
+[node name="TunnelWarp2" parent="Warps" instance=ExtResource("4_qjd5y")]
+position = Vector2(16, 16)
+rotation = 1.5708

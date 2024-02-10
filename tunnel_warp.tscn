@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3 uid="uid://ckrib0710xj7n"]
+
+[ext_resource type="Script" path="res://multi_warp.gd" id="1_y4q50"]
+[ext_resource type="PackedScene" uid="uid://bwbpgqsxmu1rl" path="res://warp.tscn" id="2_2pns8"]
+
+[node name="TunnelWarp" type="Node2D"]
+script = ExtResource("1_y4q50")
+
+[node name="Warp1" parent="." instance=ExtResource("2_2pns8")]
+target_path = NodePath("../Warp2")
+
+[node name="Warp2" parent="." instance=ExtResource("2_2pns8")]
+rotation = 3.14159
+target_path = NodePath("../Warp1")

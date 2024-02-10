@@ -3,7 +3,7 @@
 [ext_resource type="TileSet" uid="uid://ij6ensf36lys" path="res://assets/tileset.tres" id="1_l1fop"]
 [ext_resource type="Script" path="res://maze.gd" id="2_4gupg"]
 [ext_resource type="PackedScene" uid="uid://cvq8bpxksvjic" path="res://player.tscn" id="3_321rg"]
-[ext_resource type="PackedScene" uid="uid://bwbpgqsxmu1rl" path="res://warp.tscn" id="3_u10lr"]
+[ext_resource type="PackedScene" uid="uid://ckrib0710xj7n" path="res://tunnel_warp.tscn" id="4_6m0lo"]
 [ext_resource type="PackedScene" uid="uid://dsr1krydjessl" path="res://corner_warp.tscn" id="5_eocse"]
 
 [node name="Endless Corridors" type="TileMap"]
@@ -24,51 +24,47 @@ script = ExtResource("2_4gupg")
 [node name="Warps" type="Node2D" parent="."]
 z_index = 1
 
-[node name="WarpField1" parent="Warps" instance=ExtResource("3_u10lr")]
-modulate = Color(0.85098, 0, 0, 1)
-position = Vector2(-144, -208)
-target_path = NodePath("../WarpField2")
+[node name="TunnelWarp1" parent="Warps" instance=ExtResource("4_6m0lo")]
+modulate = Color(0.85, 0, 0, 1)
+position = Vector2(-144, 0)
 
-[node name="WarpField2" parent="Warps" instance=ExtResource("3_u10lr")]
-modulate = Color(0.85098, 0, 0, 1)
-position = Vector2(-144, 208)
-rotation = 3.14159
-target_path = NodePath("../WarpField1")
+[node name="Warp1" parent="Warps/TunnelWarp1" index="0"]
+position = Vector2(0, -208)
 
-[node name="WarpField3" parent="Warps" instance=ExtResource("3_u10lr")]
+[node name="Warp2" parent="Warps/TunnelWarp1" index="1"]
+position = Vector2(0, 208)
+
+[node name="TunnelWarp2" parent="Warps" instance=ExtResource("4_6m0lo")]
 modulate = Color(0.85098, 0.780392, 0, 1)
-position = Vector2(144, -208)
-target_path = NodePath("../WarpField4")
+position = Vector2(144, 0)
 
-[node name="WarpField4" parent="Warps" instance=ExtResource("3_u10lr")]
-modulate = Color(0.85098, 0.780392, 0, 1)
-position = Vector2(144, 208)
-rotation = 3.14159
-target_path = NodePath("../WarpField3")
+[node name="Warp1" parent="Warps/TunnelWarp2" index="0"]
+position = Vector2(0, -208)
 
-[node name="WarpField5" parent="Warps" instance=ExtResource("3_u10lr")]
+[node name="Warp2" parent="Warps/TunnelWarp2" index="1"]
+position = Vector2(0, 208)
+
+[node name="TunnelWarp3" parent="Warps" instance=ExtResource("4_6m0lo")]
 modulate = Color(0, 0.85098, 0.141176, 1)
-position = Vector2(-208, -144)
+position = Vector2(0, -144)
 rotation = -1.5708
-target_path = NodePath("../WarpField6")
 
-[node name="WarpField6" parent="Warps" instance=ExtResource("3_u10lr")]
-modulate = Color(0, 0.85098, 0.141176, 1)
-position = Vector2(208, -144)
-rotation = 1.5708
-target_path = NodePath("../WarpField5")
+[node name="Warp1" parent="Warps/TunnelWarp3" index="0"]
+position = Vector2(0, -208)
 
-[node name="WarpField7" parent="Warps" instance=ExtResource("3_u10lr")]
-modulate = Color(0, 0, 0.85098, 1)
-position = Vector2(-208, 144)
-rotation = 4.71239
-target_path = NodePath("../WarpField8")
+[node name="Warp2" parent="Warps/TunnelWarp3" index="1"]
+position = Vector2(0, 208)
 
-[node name="WarpField8" parent="Warps" instance=ExtResource("3_u10lr")]
-modulate = Color(0, 0, 0.85098, 1)
-position = Vector2(208, 144)
-rotation = 1.5708
-target_path = NodePath("../WarpField7")
+[node name="TunnelWarp4" parent="Warps" instance=ExtResource("4_6m0lo")]
+modulate = Color(0, 0.482353, 0.85098, 1)
+position = Vector2(0, 144)
+rotation = -1.5708
+
+[node name="Warp1" parent="Warps/TunnelWarp4" index="0"]
+position = Vector2(0, -208)
+
+[node name="Warp2" parent="Warps/TunnelWarp4" index="1"]
+position = Vector2(0, 208)
 
 [node name="CornerWarp1" parent="Warps" instance=ExtResource("5_eocse")]
 position = Vector2(-80, -80)
@@ -84,3 +80,8 @@ rotation = 3.14159
 [node name="CornerWarp4" parent="Warps" instance=ExtResource("5_eocse")]
 position = Vector2(80, 80)
 rotation = 1.5708
+
+[editable path="Warps/TunnelWarp1"]
+[editable path="Warps/TunnelWarp2"]
+[editable path="Warps/TunnelWarp3"]
+[editable path="Warps/TunnelWarp4"]

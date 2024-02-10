@@ -7,16 +7,10 @@ func get_warps() -> Array:
 
 
 func _ready():
-	for warp in get_children():
-		_update_warp(warp)
-
-	for warp in get_children():
+	for warp in get_warps():
+		warp.transform = transform * warp.transform
+	
+	for warp in get_warps():
 		warp.recalculate()
-
-	position = Vector2()
-	rotation = 0.0
-
-
-func _update_warp(warp : Warp):
-	warp.position += position
-	warp.rotation += rotation
+	
+	transform = Transform2D.IDENTITY
