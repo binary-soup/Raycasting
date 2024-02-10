@@ -174,7 +174,6 @@ func _handle_warp(start : Vector2, target : Vector2):
 # DebugOptions group
 func _on_far_plane_value_changed(val : float):
 	far_plane = val
-	emit_signal("physics_changed")
 
 
 # DebugOptions group

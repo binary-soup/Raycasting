@@ -1,11 +1,6 @@
 extends TextureRect
 class_name Canvas
 
-@export_node_path("Maze") var maze_path
-@onready var maze : Maze = get_node(maze_path)
-@onready var player : Player = maze.get_node("Player")
-
-
 var rd : RenderingDevice
 var shader : RID
 var pipeline : RID
@@ -16,18 +11,38 @@ var data_texture : ImageTexture
 var canvas_size : Vector2i
 var output_data_size : Vector2i
 
+var far_plane : float :
+	set(val):
+		far_plane = val
+		material.set_shader_parameter("far_plane", val)
+		_calculate_frame()
+
+
+var player : Player :
+	set(val):
+		if player != null:
+			player.disconnect("physics_changed", _calculate_frame)
+		
+		player = val
+		player.far_plane = far_plane
+		player.connect("physics_changed", _calculate_frame)
+
+
+var maze : Maze :
+	set(val):
+		maze = val
+		player = maze.get_node("Player")
+		
+		# create data uniforms that don't change
+		_build_tilemap_uniform()
+		_build_warps_uniform()
+		
+		_calculate_frame()
+
 
 func _ready():
-	_init_shader_parameters()
 	_init_compute()
 	_on_resized()
-	
-	player.connect("physics_changed", _calculate_frame)
-	_calculate_frame()
-
-
-func _init_shader_parameters():
-	material.set_shader_parameter("far_plane", player.far_plane)
 
 
 func _init_compute():
@@ -38,10 +53,6 @@ func _init_compute():
 	var spirv := preload("res://raycasting.glsl").get_spirv()
 	shader = rd.shader_create_from_spirv(spirv)
 	pipeline = rd.compute_pipeline_create(shader)
-	
-	# create data uniforms that don't change
-	_build_tilemap_uniform()
-	_build_warps_uniform()
 
 
 func _on_resized():
@@ -85,7 +96,7 @@ func _build_camera_data_uniform():
 	var data : PackedByteArray = PackedFloat32Array([
 		origin.x, origin.y,
 		player.rotation,
-		player.far_plane,
+		far_plane,
 		player.fov,
 	]).to_byte_array()
 
@@ -138,6 +149,9 @@ func _warp_to_byte_array(warp : Warp) -> PackedByteArray:
 
 
 func _calculate_frame():
+	if maze == null:
+		return
+	
 	# rebuild data uniforms that change every frame
 	_build_camera_data_uniform()
 	material.set_shader_parameter("origin", player.virtual_pos)
@@ -183,4 +197,4 @@ func _on_parallax_mapping_toggled(val : bool):
 
 # DebugOptions group
 func _on_far_plane_value_changed(val : float):
-	material.set_shader_parameter("far_plane", val)
+	far_plane = val

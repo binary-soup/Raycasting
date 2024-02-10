@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://cvq8bpxksvjic" path="res://player.tscn" id="3_321rg"]
 [ext_resource type="PackedScene" uid="uid://bwbpgqsxmu1rl" path="res://warp.tscn" id="3_u10lr"]
 
-[node name="Maze" type="TileMap"]
+[node name="Endless Corridors" type="TileMap"]
 texture_filter = 1
 tile_set = ExtResource("1_l1fop")
 format = 2
